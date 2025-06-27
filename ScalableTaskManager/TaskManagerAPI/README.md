@@ -13,107 +13,62 @@ A scalable, cloud-native Task Manager API built with **.NET Core** and deployed 
 This project implements a **3-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
 
 ```mermaid
-graph TB
-    %% External Access
-    Users["👥 Users/Clients"]
+graph LR
+    %% External Users
+    Users["👥 Users"]
     
-    %% AWS Cloud Infrastructure
+    %% AWS Cloud Services
     subgraph AWS["☁️ AWS Cloud"]
         
-        %% Internet Gateway
-        IGW["🌐 Internet Gateway"]
+        %% Numbered flow like in the image
+        IGW["1️⃣<br/>🌐<br/>Internet Gateway"]
+        ALB["2️⃣<br/>⚖️<br/>Application Load Balancer"]
+        EC2["3️⃣<br/>🖥️<br/>Amazon EC2<br/>Auto Scaling"]
+        RDS["4️⃣<br/>🗄️<br/>Amazon RDS<br/>MySQL"]
         
-        %% VPC Container
-        subgraph VPC["🏢 VPC 10.0.0.0/16"]
-            
-            %% Public Tier
-            subgraph PublicTier["🌍 PUBLIC TIER"]
-                ALB["⚖️ Application Load Balancer<br/>HTTP/HTTPS Traffic<br/>Health Checks<br/>SSL Termination"]
-                PubSub1["📡 Public Subnet<br/>10.0.1.0/24 AZ-A"]
-                PubSub2["📡 Public Subnet<br/>10.0.2.0/24 AZ-B"]
-            end
-            
-            %% Application Tier
-            subgraph AppTier["💻 APPLICATION TIER"]
-                EC2_1["🖥️ EC2 Instance 1<br/>t3.medium<br/>.NET Core API<br/>Docker Container"]
-                EC2_2["🖥️ EC2 Instance 2<br/>t3.medium<br/>.NET Core API<br/>Docker Container"]
-                ASG["📈 Auto Scaling Group<br/>Min: 1, Max: 5<br/>CPU-based Scaling"]
-                PrivSub1["🔒 Private Subnet<br/>10.0.3.0/24 AZ-A"]
-                PrivSub2["🔒 Private Subnet<br/>10.0.4.0/24 AZ-B"]
-            end
-            
-            %% Database Tier
-            subgraph DataTier["🗄️ DATABASE TIER"]
-                RDS["🐬 Amazon RDS MySQL<br/>Version 8.0<br/>Multi-AZ Deployment<br/>Encrypted Storage<br/>Automated Backups"]
-            end
-            
-        end
-        
-        %% Security & Monitoring
-        subgraph Security["🔐 Security"]
-            SG["🛡️ Security Groups<br/>Network Access Control"]
-            IAM["👤 IAM Roles<br/>Service Permissions"]
-        end
-        
-        subgraph Monitoring["📊 Monitoring"]
-            CW["📈 CloudWatch<br/>Logs & Metrics"]
-            SNS["📧 SNS Notifications<br/>Email Alerts"]
-            Alarms["⚠️ CloudWatch Alarms<br/>CPU & Health Monitoring"]
+        %% Supporting Services
+        subgraph Support["AWS Supporting Services"]
+            CW["📊<br/>CloudWatch<br/>Monitoring"]
+            SNS["📧<br/>Amazon SNS<br/>Notifications"]
+            IAM["👤<br/>AWS IAM<br/>Identity & Access"]
+            VPC["🏢<br/>Amazon VPC<br/>Networking"]
         end
         
     end
     
-    %% Connections
+    %% Traffic Flow
     Users --> IGW
     IGW --> ALB
-    ALB --> EC2_1
-    ALB --> EC2_2
-    EC2_1 --> RDS
-    EC2_2 --> RDS
+    ALB --> EC2
+    EC2 --> RDS
     
-    %% Auto Scaling
-    ASG -.-> EC2_1
-    ASG -.-> EC2_2
-    
-    %% Security
-    SG -.-> ALB
-    SG -.-> EC2_1
-    SG -.-> EC2_2
-    SG -.-> RDS
-    IAM -.-> EC2_1
-    IAM -.-> EC2_2
-    
-    %% Monitoring
-    EC2_1 --> CW
-    EC2_2 --> CW
+    %% Monitoring & Management
+    EC2 --> CW
     RDS --> CW
     ALB --> CW
-    CW --> Alarms
-    Alarms --> SNS
-    Alarms --> ASG
+    CW --> SNS
     
-    %% Network Placement
-    ALB -.-> PubSub1
-    ALB -.-> PubSub2
-    EC2_1 -.-> PrivSub1
-    EC2_2 -.-> PrivSub2
+    %% Security & Access
+    IAM -.-> EC2
+    IAM -.-> RDS
+    VPC -.-> ALB
+    VPC -.-> EC2
+    VPC -.-> RDS
     
-    %% Styling
-    classDef awsService fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:#FFFFFF
-    classDef networkService fill:#3498DB,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
-    classDef computeService fill:#27AE60,stroke:#1E8449,stroke-width:2px,color:#FFFFFF
-    classDef storageService fill:#8E44AD,stroke:#6C3483,stroke-width:2px,color:#FFFFFF
-    classDef securityService fill:#E74C3C,stroke:#C0392B,stroke-width:2px,color:#FFFFFF
-    classDef monitoringService fill:#F39C12,stroke:#D68910,stroke-width:2px,color:#FFFFFF
-    classDef userService fill:#34495E,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
+    %% Styling for AWS Services
+    classDef awsCompute fill:#FF9900,stroke:#232F3E,stroke-width:3px,color:#FFFFFF
+    classDef awsDatabase fill:#3F48CC,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
+    classDef awsNetwork fill:#8C4FFF,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
+    classDef awsMonitoring fill:#759C3E,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
+    classDef awsManagement fill:#FF4B4B,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
+    classDef userAccess fill:#34495E,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
     
-    class AWS,VPC awsService
-    class IGW,ALB,PubSub1,PubSub2,PrivSub1,PrivSub2 networkService
-    class ASG,EC2_1,EC2_2 computeService
-    class RDS storageService
-    class Security,SG,IAM securityService
-    class Monitoring,CW,SNS,Alarms monitoringService
-    class Users userService
+    class EC2 awsCompute
+    class RDS awsDatabase
+    class IGW,ALB,VPC awsNetwork
+    class CW,SNS awsMonitoring
+    class IAM awsManagement
+    class Users userAccess
 ```
 
 ## 🚀 Features
@@ -357,41 +312,34 @@ terraform output application_load_balancer_dns
 - **Alerts**: Email notifications via SNS
 - **Auto Scaling**: Automatic scaling based on CPU utilization
 
-## 📊 Infrastructure Components
+## 📊 AWS Services Architecture
 
-### **🌐 Networking**
-- **VPC**: Custom Virtual Private Cloud (10.0.0.0/16)
-- **Subnets**: Public (ALB) and Private (App/DB) across 2 AZs
-- **Internet Gateway**: Internet connectivity
-- **Route Tables**: Traffic routing configuration
+### **🌐 Core AWS Services (Main Data Flow)**
 
-### **⚖️ Load Balancing & Auto Scaling**
-- **Application Load Balancer**: Distributes HTTP/HTTPS traffic
-- **Target Groups**: Health checks and traffic routing
-- **Auto Scaling Group**: Dynamic scaling (1-5 instances)
-- **Launch Template**: EC2 configuration template
+| Step | Service | Function | Details |
+|------|---------|----------|---------|
+| **1️⃣** | **Internet Gateway** | Internet Access | Entry point for external traffic |
+| **2️⃣** | **Application Load Balancer** | Load Distribution | HTTP/HTTPS traffic routing & health checks |
+| **3️⃣** | **Amazon EC2** | Compute & Auto Scaling | t3.medium instances with .NET Core API |
+| **4️⃣** | **Amazon RDS** | Database | MySQL 8.0 with Multi-AZ deployment |
 
-### **💻 Compute**
-- **EC2 Instances**: t3.medium running .NET Core API
-- **Docker Containers**: Containerized application deployment
-- **Multi-AZ Deployment**: High availability across zones
+### **🛠️ Supporting AWS Services**
 
-### **🗄️ Database**
-- **Amazon RDS MySQL 8.0**: Managed database service
-- **Multi-AZ**: Automatic failover capability
-- **Encrypted Storage**: Data encryption at rest
-- **Automated Backups**: 7-day retention policy
+| Service | Category | Purpose |
+|---------|----------|---------|
+| **Amazon VPC** | 🌐 Networking | Virtual network with public/private subnets |
+| **AWS IAM** | 🔒 Security | Identity & access management for services |
+| **CloudWatch** | 📊 Monitoring | Centralized logging, metrics & alarms |
+| **Amazon SNS** | 📧 Notifications | Email alerts for scaling & health events |
 
-### **🔒 Security**
-- **Security Groups**: Network-level firewall rules
-- **IAM Roles**: Service permissions and access control
-- **Private Subnets**: Isolated application and database tiers
+### **🏗️ Infrastructure Features**
 
-### **📊 Monitoring & Alerts**
-- **CloudWatch**: Centralized logging and monitoring
-- **CloudWatch Alarms**: CPU, memory, and health monitoring
-- **SNS**: Email notifications for critical events
-- **Auto Scaling Policies**: CPU-based scaling triggers
+✅ **Auto Scaling**: 1-5 EC2 instances based on CPU utilization  
+✅ **High Availability**: Multi-AZ deployment for RDS and load balancing  
+✅ **Security**: VPC isolation, Security Groups, and IAM roles  
+✅ **Monitoring**: CloudWatch metrics with SNS notifications  
+✅ **Encryption**: Data encryption at rest for RDS  
+✅ **Backup**: Automated database backups with 7-day retention
 
 ## 🔍 Monitoring & Troubleshooting
 
