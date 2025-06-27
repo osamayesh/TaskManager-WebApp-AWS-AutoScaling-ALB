@@ -15,28 +15,28 @@ This project implements a **3-tier AWS architecture** with high availability, au
 ```mermaid
 graph LR
     %% External Users
-    Users["👥 Users"]
+    Users["👥<br/>Users"]
     
-    %% AWS Cloud Services
+    %% AWS Cloud Services with specific icons
     subgraph AWS["☁️ AWS Cloud"]
         
-        %% Numbered flow like in the image
+        %% Main data flow with AWS service icons
         IGW["1️⃣<br/>🌐<br/>Internet Gateway"]
-        ALB["2️⃣<br/>⚖️<br/>Application Load Balancer"]
-        EC2["3️⃣<br/>🖥️<br/>Amazon EC2<br/>Auto Scaling"]
+        ALB["2️⃣<br/>🔄<br/>Application Load Balancer"]
+        EC2["3️⃣<br/>🟠<br/>Amazon EC2<br/>Auto Scaling"]
         RDS["4️⃣<br/>🗄️<br/>Amazon RDS<br/>MySQL"]
         
-        %% Supporting Services
+        %% Supporting Services with specific AWS icons
         subgraph Support["AWS Supporting Services"]
-            CW["📊<br/>CloudWatch<br/>Monitoring"]
-            SNS["📧<br/>Amazon SNS<br/>Notifications"]
-            IAM["👤<br/>AWS IAM<br/>Identity & Access"]
-            VPC["🏢<br/>Amazon VPC<br/>Networking"]
+            VPC["🏗️<br/>Amazon VPC<br/>Networking"]
+            IAM["🔐<br/>AWS IAM<br/>Identity & Access"]
+            CW["📈<br/>CloudWatch<br/>Monitoring"]
+            SNS["📨<br/>Amazon SNS<br/>Notifications"]
         end
         
     end
     
-    %% Traffic Flow
+    %% Data Flow
     Users --> IGW
     IGW --> ALB
     ALB --> EC2
@@ -48,14 +48,14 @@ graph LR
     ALB --> CW
     CW --> SNS
     
-    %% Security & Access
+    %% Security & Infrastructure
     IAM -.-> EC2
     IAM -.-> RDS
     VPC -.-> ALB
     VPC -.-> EC2
     VPC -.-> RDS
     
-    %% Styling for AWS Services
+    %% AWS Service Color Styling
     classDef awsCompute fill:#FF9900,stroke:#232F3E,stroke-width:3px,color:#FFFFFF
     classDef awsDatabase fill:#3F48CC,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
     classDef awsNetwork fill:#8C4FFF,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
@@ -316,21 +316,21 @@ terraform output application_load_balancer_dns
 
 ### **🌐 Core AWS Services (Main Data Flow)**
 
-| Step | Service | Function | Details |
-|------|---------|----------|---------|
-| **1️⃣** | **Internet Gateway** | Internet Access | Entry point for external traffic |
-| **2️⃣** | **Application Load Balancer** | Load Distribution | HTTP/HTTPS traffic routing & health checks |
-| **3️⃣** | **Amazon EC2** | Compute & Auto Scaling | t3.medium instances with .NET Core API |
-| **4️⃣** | **Amazon RDS** | Database | MySQL 8.0 with Multi-AZ deployment |
+| Step | Service | Icon | Function | Details |
+|------|---------|------|----------|---------|
+| **1️⃣** | **Internet Gateway** | 🌐 | Internet Access | Entry point for external traffic |
+| **2️⃣** | **Application Load Balancer** | 🔄 | Load Distribution | HTTP/HTTPS traffic routing & health checks |
+| **3️⃣** | **Amazon EC2** | 🟠 | Compute & Auto Scaling | t3.medium instances with .NET Core API |
+| **4️⃣** | **Amazon RDS** | 🗄️ | Database | MySQL 8.0 with Multi-AZ deployment |
 
 ### **🛠️ Supporting AWS Services**
 
-| Service | Category | Purpose |
-|---------|----------|---------|
-| **Amazon VPC** | 🌐 Networking | Virtual network with public/private subnets |
-| **AWS IAM** | 🔒 Security | Identity & access management for services |
-| **CloudWatch** | 📊 Monitoring | Centralized logging, metrics & alarms |
-| **Amazon SNS** | 📧 Notifications | Email alerts for scaling & health events |
+| Service | Icon | Category | Purpose |
+|---------|------|----------|---------|
+| **Amazon VPC** | 🏗️ | Networking | Virtual network with public/private subnets |
+| **AWS IAM** | 🔐 | Security | Identity & access management for services |
+| **CloudWatch** | 📈 | Monitoring | Centralized logging, metrics & alarms |
+| **Amazon SNS** | 📨 | Notifications | Email alerts for scaling & health events |
 
 ### **🏗️ Infrastructure Features**
 
