@@ -14,111 +14,103 @@ This project implements a **3-tier AWS architecture** with high availability, au
 
 ```mermaid
 graph TB
-    %% External Users
-    Users[👥 Users/Clients]
+    %% External Access
+    Users["👥 Users/Clients"]
     
-    %% AWS Cloud
-    subgraph AWS["☁️ AWS Cloud - Task Manager API"]
-        direction TB
+    %% AWS Cloud Infrastructure
+    subgraph AWS["☁️ AWS Cloud"]
         
         %% Internet Gateway
-        IGW[🌐 Internet Gateway]
+        IGW["🌐 Internet Gateway"]
         
-        %% VPC
-        subgraph VPC["🏢 VPC: 10.0.0.0/16"]
-            direction TB
+        %% VPC Container
+        subgraph VPC["🏢 VPC 10.0.0.0/16"]
             
             %% Public Tier
             subgraph PublicTier["🌍 PUBLIC TIER"]
-                direction LR
-                subgraph AZ1["🏢 Availability Zone A"]
-                    PubSub1[📡 Public Subnet<br/>10.0.1.0/24]
-                end
-                subgraph AZ2["🏢 Availability Zone B"] 
-                    PubSub2[📡 Public Subnet<br/>10.0.2.0/24]
-                end
-                ALB[⚖️ Application Load Balancer<br/>• HTTP/HTTPS Traffic<br/>• Health Checks<br/>• SSL Termination]
+                ALB["⚖️ Application Load Balancer<br/>HTTP/HTTPS Traffic<br/>Health Checks<br/>SSL Termination"]
+                PubSub1["📡 Public Subnet<br/>10.0.1.0/24 AZ-A"]
+                PubSub2["📡 Public Subnet<br/>10.0.2.0/24 AZ-B"]
             end
             
             %% Application Tier
             subgraph AppTier["💻 APPLICATION TIER"]
-                direction LR
-                subgraph AZ3["🏢 Availability Zone A"]
-                    PrivSub1[🔒 Private Subnet<br/>10.0.3.0/24]
-                    EC2_1[🖥️ EC2 Instance<br/>• t3.medium<br/>• .NET Core API<br/>• Docker Container<br/>• Auto Scaling]
-                end
-                subgraph AZ4["🏢 Availability Zone B"]
-                    PrivSub2[🔒 Private Subnet<br/>10.0.4.0/24] 
-                    EC2_2[🖥️ EC2 Instance<br/>• t3.medium<br/>• .NET Core API<br/>• Docker Container<br/>• Auto Scaling]
-                end
-                ASG[📈 Auto Scaling Group<br/>• Min: 1, Max: 5<br/>• CPU-based Scaling<br/>• Target Tracking]
+                EC2_1["🖥️ EC2 Instance 1<br/>t3.medium<br/>.NET Core API<br/>Docker Container"]
+                EC2_2["🖥️ EC2 Instance 2<br/>t3.medium<br/>.NET Core API<br/>Docker Container"]
+                ASG["📈 Auto Scaling Group<br/>Min: 1, Max: 5<br/>CPU-based Scaling"]
+                PrivSub1["🔒 Private Subnet<br/>10.0.3.0/24 AZ-A"]
+                PrivSub2["🔒 Private Subnet<br/>10.0.4.0/24 AZ-B"]
             end
             
             %% Database Tier
             subgraph DataTier["🗄️ DATABASE TIER"]
-                RDS[🐬 Amazon RDS MySQL<br/>• Version 8.0.x<br/>• Multi-AZ Deployment<br/>• Encrypted Storage<br/>• Automated Backups<br/>• 7-day Retention]
+                RDS["🐬 Amazon RDS MySQL<br/>Version 8.0<br/>Multi-AZ Deployment<br/>Encrypted Storage<br/>Automated Backups"]
             end
             
         end
         
-        %% Monitoring & Security
-        subgraph Services["🔧 AWS SERVICES"]
-            direction TB
-            subgraph Security["🔐 Security"]
-                SG[🛡️ Security Groups<br/>• ALB: 80,443 ← Internet<br/>• EC2: 80 ← ALB, 22 ← SSH<br/>• RDS: 3306 ← EC2]
-                IAM[👤 IAM Roles<br/>• EC2 Instance Profile<br/>• CloudWatch Permissions]
-            end
-            
-            subgraph Monitoring["📊 Monitoring & Alerts"]
-                CW[📈 CloudWatch<br/>• Application Logs<br/>• System Metrics<br/>• Custom Metrics]
-                SNS[📧 SNS Notifications<br/>• Email Alerts<br/>• Scaling Events<br/>• System Alarms]
-                Alarms[⚠️ CloudWatch Alarms<br/>• CPU Utilization<br/>• Memory Usage<br/>• Health Checks<br/>• Database Performance]
-            end
+        %% Security & Monitoring
+        subgraph Security["🔐 Security"]
+            SG["🛡️ Security Groups<br/>Network Access Control"]
+            IAM["👤 IAM Roles<br/>Service Permissions"]
         end
+        
+        subgraph Monitoring["📊 Monitoring"]
+            CW["📈 CloudWatch<br/>Logs & Metrics"]
+            SNS["📧 SNS Notifications<br/>Email Alerts"]
+            Alarms["⚠️ CloudWatch Alarms<br/>CPU & Health Monitoring"]
+        end
+        
     end
     
-    %% Traffic Flow
-    Users -->|HTTPS/HTTP| IGW
+    %% Connections
+    Users --> IGW
     IGW --> ALB
-    ALB -->|HTTP:80| EC2_1
-    ALB -->|HTTP:80| EC2_2
-    EC2_1 -->|MySQL:3306| RDS
-    EC2_2 -->|MySQL:3306| RDS
+    ALB --> EC2_1
+    ALB --> EC2_2
+    EC2_1 --> RDS
+    EC2_2 --> RDS
     
     %% Auto Scaling
-    ASG -.->|Manages| EC2_1
-    ASG -.->|Manages| EC2_2
+    ASG -.-> EC2_1
+    ASG -.-> EC2_2
     
     %% Security
-    SG -.->|Protects| ALB
-    SG -.->|Protects| EC2_1
-    SG -.->|Protects| EC2_2
-    SG -.->|Protects| RDS
-    IAM -.->|Authorizes| EC2_1
-    IAM -.->|Authorizes| EC2_2
+    SG -.-> ALB
+    SG -.-> EC2_1
+    SG -.-> EC2_2
+    SG -.-> RDS
+    IAM -.-> EC2_1
+    IAM -.-> EC2_2
     
     %% Monitoring
-    EC2_1 -->|Logs & Metrics| CW
-    EC2_2 -->|Logs & Metrics| CW
-    RDS -->|Database Metrics| CW
-    ALB -->|Load Balancer Metrics| CW
+    EC2_1 --> CW
+    EC2_2 --> CW
+    RDS --> CW
+    ALB --> CW
     CW --> Alarms
-    Alarms -->|Triggers| SNS
-    Alarms -->|Triggers| ASG
+    Alarms --> SNS
+    Alarms --> ASG
+    
+    %% Network Placement
+    ALB -.-> PubSub1
+    ALB -.-> PubSub2
+    EC2_1 -.-> PrivSub1
+    EC2_2 -.-> PrivSub2
     
     %% Styling
-    classDef awsCloud fill:#232F3E,stroke:#FF9900,stroke-width:3px,color:#FFFFFF
-    classDef publicTier fill:#3498DB,stroke:#2980B9,stroke-width:2px,color:#FFFFFF
-    classDef appTier fill:#27AE60,stroke:#229954,stroke-width:2px,color:#FFFFFF
-    classDef dataTier fill:#8E44AD,stroke:#7D3C98,stroke-width:2px,color:#FFFFFF
+    classDef awsService fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:#FFFFFF
+    classDef networkService fill:#3498DB,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
+    classDef computeService fill:#27AE60,stroke:#1E8449,stroke-width:2px,color:#FFFFFF
+    classDef storageService fill:#8E44AD,stroke:#6C3483,stroke-width:2px,color:#FFFFFF
     classDef securityService fill:#E74C3C,stroke:#C0392B,stroke-width:2px,color:#FFFFFF
-    classDef monitoringService fill:#F39C12,stroke:#E67E22,stroke-width:2px,color:#FFFFFF
+    classDef monitoringService fill:#F39C12,stroke:#D68910,stroke-width:2px,color:#FFFFFF
     classDef userService fill:#34495E,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
     
-    class AWS awsCloud
-    class PublicTier,ALB,IGW publicTier
-    class AppTier,ASG,EC2_1,EC2_2 appTier
-    class DataTier,RDS dataTier
+    class AWS,VPC awsService
+    class IGW,ALB,PubSub1,PubSub2,PrivSub1,PrivSub2 networkService
+    class ASG,EC2_1,EC2_2 computeService
+    class RDS storageService
     class Security,SG,IAM securityService
     class Monitoring,CW,SNS,Alarms monitoringService
     class Users userService
@@ -230,7 +222,7 @@ cd TaskManager-WebApp-AWS-AutoScaling-ALB
 ```
 
 ### **2. Local Development Setup**
-```bash
+   ```bash
 # Start MySQL database and API with Docker Compose
 cd aws-infrastructure
 docker-compose up -d
@@ -241,7 +233,7 @@ docker-compose up -d
 ```
 
 ### **3. AWS Deployment**
-```bash
+   ```bash
 # Navigate to Terraform directory
 cd aws-infrastructure/terraform
 
@@ -258,7 +250,7 @@ terraform apply
 ## 🔧 Configuration
 
 ### **Environment Variables**
-```bash
+   ```bash
 # Database Configuration
 ConnectionStrings__DefaultConnection="Server=mysql;Database=TaskManagerDB_Dev;User=root;Password=yourpassword;"
 
@@ -336,22 +328,22 @@ curl -X POST http://localhost:5000/api/tasks \
 ### **AWS Production Deployment**
 
 #### **Step 1: Prerequisites**
-```bash
+   ```bash
 # Install required tools
 aws configure  # Configure AWS credentials
 terraform --version  # Verify Terraform installation
-```
+   ```
 
 #### **Step 2: Deploy Infrastructure**
-```bash
-cd aws-infrastructure/terraform
+   ```bash
+   cd aws-infrastructure/terraform
 cp terraform.tfvars.example terraform.tfvars
 
 # Edit terraform.tfvars with your configuration
-terraform init
-terraform plan
-terraform apply
-```
+   terraform init
+   terraform plan
+   terraform apply
+   ```
 
 #### **Step 3: Access Application**
 ```bash
