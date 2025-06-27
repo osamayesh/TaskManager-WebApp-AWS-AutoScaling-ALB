@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="hero-section py-5">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-tasks text-primary me-3"></i>
+                    Welcome to Task Manager
+                </h1>
+                <p class="lead mb-4">
+                    A secure and scalable task management application built with ASP.NET Core. 
+                    Organize your tasks, set priorities, track progress, and stay productive.
+                </p>
+                
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a class="btn btn-primary btn-lg me-md-2" asp-controller="Account" asp-action="Register">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a class="btn btn-outline-secondary btn-lg" asp-controller="Account" asp-action="Login">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    </div>
+                }
+                else
+                {
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a class="btn btn-primary btn-lg me-md-2" asp-controller="TasksWeb" asp-action="Index">
+                            <i class="fas fa-list me-2"></i>View My Tasks
+                        </a>
+                        <a class="btn btn-success btn-lg" asp-controller="TasksWeb" asp-action="Create">
+                            <i class="fas fa-plus me-2"></i>Create Task
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-shield-alt fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Secure & Private</h5>
+                    <p class="card-text">
+                        Your tasks are secured with industry-standard encryption and authentication. 
+                        Only you can access your personal task list.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-chart-line fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Track Progress</h5>
+                    <p class="card-text">
+                        Monitor your productivity with task status tracking, due dates, 
+                        and priority levels to stay organized and focused.
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-filter fa-3x text-info"></i>
+                    </div>
+                    <h5 class="card-title">Advanced Filtering</h5>
+                    <p class="card-text">
+                        Quickly find tasks with powerful search and filtering options. 
+                        Filter by status, priority, due date, or search by keywords.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="row mt-5">
+            <div class="col-lg-10 mx-auto">
+                <div class="card bg-light">
+                    <div class="card-body text-center py-4">
+                        <h4 class="card-title mb-3">Ready to Get Organized?</h4>
+                        <p class="card-text mb-4">
+                            Join thousands of users who trust Task Manager to keep their projects on track.
+                        </p>
+                        <a class="btn btn-primary btn-lg" asp-controller="Account" asp-action="Register">
+                            <i class="fas fa-rocket me-2"></i>Start Managing Tasks Today
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div> 

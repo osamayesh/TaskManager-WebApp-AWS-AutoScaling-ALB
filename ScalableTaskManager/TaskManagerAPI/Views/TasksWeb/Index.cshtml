@@ -1,0 +1,195 @@
+@model IEnumerable<TaskManagerAPI.Models.DTOs.TaskResponseDto>
+@{
+    ViewData["Title"] = "My Tasks";
+    var filter = ViewBag.Filter as TaskManagerAPI.Models.DTOs.TaskFilterDto;
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>
+                        <i class="fas fa-tasks text-primary me-2"></i>
+                        My Tasks
+                    </h2>
+                    <p class="text-muted mb-0">Welcome back, @ViewBag.UserName</p>
+                </div>
+                <a asp-action="Create" class="btn btn-success">
+                    <i class="fas fa-plus me-2"></i>New Task
+                </a>
+            </div>
+            
+            <!-- Filters -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-filter me-2"></i>Filter Tasks
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="get" asp-action="Index">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Status</label>
+                                <select name="Status" class="form-select">
+                                    <option value="">All Statuses</option>
+                                    <option value="0" selected="@(filter?.Status == TaskManagerAPI.Models.TaskStatus.Pending)">Pending</option>
+                                    <option value="1" selected="@(filter?.Status == TaskManagerAPI.Models.TaskStatus.InProgress)">In Progress</option>
+                                    <option value="2" selected="@(filter?.Status == TaskManagerAPI.Models.TaskStatus.Completed)">Completed</option>
+                                    <option value="3" selected="@(filter?.Status == TaskManagerAPI.Models.TaskStatus.Cancelled)">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Priority</label>
+                                <select name="Priority" class="form-select">
+                                    <option value="">All Priorities</option>
+                                    <option value="0" selected="@(filter?.Priority == TaskManagerAPI.Models.TaskPriority.Low)">Low</option>
+                                    <option value="1" selected="@(filter?.Priority == TaskManagerAPI.Models.TaskPriority.Medium)">Medium</option>
+                                    <option value="2" selected="@(filter?.Priority == TaskManagerAPI.Models.TaskPriority.High)">High</option>
+                                    <option value="3" selected="@(filter?.Priority == TaskManagerAPI.Models.TaskPriority.Critical)">Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Search</label>
+                                <input type="text" name="SearchTerm" value="@filter?.SearchTerm" 
+                                       class="form-control" placeholder="Search tasks..." />
+                            </div>
+                            <div class="col-md-2 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <a asp-action="Index" class="btn btn-outline-secondary">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Tasks Grid -->
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var task in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="card task-card h-100 priority-@task.Priority.ToString().ToLower() 
+                                        status-@task.Status.ToString().ToLower()">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-@GetPriorityColor(task.Priority) me-2">
+                                            @task.Priority
+                                        </span>
+                                        <span class="badge bg-@GetStatusColor(task.Status)">
+                                            @task.Status.ToString().Replace("InProgress", "In Progress")
+                                        </span>
+                                    </div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                                type="button" data-bs-toggle="dropdown">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" asp-action="Details" asp-route-id="@task.Id">
+                                                    <i class="fas fa-eye me-2"></i>View
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" asp-action="Edit" asp-route-id="@task.Id">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </li>
+                                            @if (task.Status != TaskManagerAPI.Models.TaskStatus.Completed)
+                                            {
+                                                <li>
+                                                    <form method="post" asp-action="Complete" asp-route-id="@task.Id" class="d-inline">
+                                                        <button type="submit" class="dropdown-item">
+                                                            <i class="fas fa-check me-2"></i>Complete
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="post" asp-action="Delete" asp-route-id="@task.Id" 
+                                                      onsubmit="return confirm('Are you sure you want to delete this task?')" class="d-inline">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        <i class="fas fa-trash me-2"></i>Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h6 class="card-title">@task.Title</h6>
+                                    @if (!string.IsNullOrEmpty(task.Description))
+                                    {
+                                        <p class="card-text text-muted small">
+                                            @(task.Description.Length > 100 ? task.Description.Substring(0, 100) + "..." : task.Description)
+                                        </p>
+                                    }
+                                </div>
+                                <div class="card-footer text-muted small">
+                                    <div class="d-flex justify-content-between">
+                                        <span>
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            Created: @task.CreatedAt.ToString("MMM dd, yyyy")
+                                        </span>
+                                        @if (task.DueDate.HasValue)
+                                        {
+                                            <span class="@(task.DueDate < DateTime.Now && task.Status != TaskManagerAPI.Models.TaskStatus.Completed ? "text-danger" : "")">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Due: @task.DueDate.Value.ToString("MMM dd, yyyy")
+                                            </span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-tasks fa-5x text-muted mb-3"></i>
+                    <h4>No tasks found</h4>
+                    <p class="text-muted">Get started by creating your first task!</p>
+                    <a asp-action="Create" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Create Your First Task
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetPriorityColor(TaskManagerAPI.Models.TaskPriority priority)
+    {
+        return priority switch
+        {
+            TaskManagerAPI.Models.TaskPriority.Low => "success",
+            TaskManagerAPI.Models.TaskPriority.Medium => "warning",
+            TaskManagerAPI.Models.TaskPriority.High => "orange",
+            TaskManagerAPI.Models.TaskPriority.Critical => "danger",
+            _ => "secondary"
+        };
+    }
+    
+    string GetStatusColor(TaskManagerAPI.Models.TaskStatus status)
+    {
+        return status switch
+        {
+            TaskManagerAPI.Models.TaskStatus.Pending => "warning",
+            TaskManagerAPI.Models.TaskStatus.InProgress => "info",
+            TaskManagerAPI.Models.TaskStatus.Completed => "success",
+            TaskManagerAPI.Models.TaskStatus.Cancelled => "danger",
+            _ => "secondary"
+        };
+    }
+} 

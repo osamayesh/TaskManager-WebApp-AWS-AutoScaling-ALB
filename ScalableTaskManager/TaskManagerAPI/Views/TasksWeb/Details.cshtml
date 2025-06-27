@@ -1,0 +1,291 @@
+@model TaskManagerAPI.Models.DTOs.TaskResponseDto
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Main Task Card -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-info text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-eye me-2"></i>Task Details
+                        </h4>
+                        <div>
+                            <span class="badge bg-@GetPriorityColor(Model.Priority) me-2 fs-6">
+                                @Model.Priority Priority
+                            </span>
+                            <span class="badge bg-@GetStatusColor(Model.Status) fs-6">
+                                @Model.Status.ToString().Replace("InProgress", "In Progress")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Task Title -->
+                    <div class="mb-4">
+                        <h2 class="text-primary mb-2">
+                            <i class="fas fa-heading me-2"></i>@Model.Title
+                        </h2>
+                        <hr class="border-primary">
+                    </div>
+                    
+                    <!-- Task Description -->
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mb-4">
+                            <h5 class="text-secondary mb-3">
+                                <i class="fas fa-align-left me-2"></i>Description
+                            </h5>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="mb-0 lh-lg">@Model.Description</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <!-- Task Information Grid -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-start border-4 border-primary">
+                                <div class="card-body py-3">
+                                    <h6 class="card-title text-muted mb-1">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>Priority Level
+                                    </h6>
+                                    <p class="card-text h5 mb-0 text-@GetPriorityColor(Model.Priority)">
+                                        @GetPriorityIcon(Model.Priority) @Model.Priority
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <div class="card border-start border-4 border-info">
+                                <div class="card-body py-3">
+                                    <h6 class="card-title text-muted mb-1">
+                                        <i class="fas fa-tasks me-2"></i>Current Status
+                                    </h6>
+                                    <p class="card-text h5 mb-0 text-@GetStatusColor(Model.Status)">
+                                        @GetStatusIcon(Model.Status) @Model.Status.ToString().Replace("InProgress", "In Progress")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dates Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-start border-4 border-success">
+                                <div class="card-body py-3">
+                                    <h6 class="card-title text-muted mb-1">
+                                        <i class="fas fa-calendar-plus me-2"></i>Created
+                                    </h6>
+                                    <p class="card-text mb-0">
+                                        <strong>@Model.CreatedAt.ToString("MMM dd, yyyy")</strong><br>
+                                        <small class="text-muted">@Model.CreatedAt.ToString("hh:mm tt")</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        @if (Model.DueDate.HasValue)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-start border-4 border-warning">
+                                    <div class="card-body py-3">
+                                        <h6 class="card-title text-muted mb-1">
+                                            <i class="fas fa-clock me-2"></i>Due Date
+                                        </h6>
+                                        <p class="card-text mb-0 @(Model.DueDate < DateTime.Now && Model.Status != TaskManagerAPI.Models.TaskStatus.Completed ? "text-danger" : "")">
+                                            <strong>@Model.DueDate.Value.ToString("MMM dd, yyyy")</strong><br>
+                                            <small class="text-muted">@Model.DueDate.Value.ToString("hh:mm tt")</small>
+                                            @if (Model.DueDate < DateTime.Now && Model.Status != TaskManagerAPI.Models.TaskStatus.Completed)
+                                            {
+                                                <br><small class="text-danger"><i class="fas fa-exclamation-triangle me-1"></i>Overdue</small>
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (Model.CompletedAt.HasValue)
+                        {
+                            <div class="col-md-4 mb-3">
+                                <div class="card border-start border-4 border-success">
+                                    <div class="card-body py-3">
+                                        <h6 class="card-title text-muted mb-1">
+                                            <i class="fas fa-check-circle me-2"></i>Completed
+                                        </h6>
+                                        <p class="card-text mb-0 text-success">
+                                            <strong>@Model.CompletedAt.Value.ToString("MMM dd, yyyy")</strong><br>
+                                            <small class="text-muted">@Model.CompletedAt.Value.ToString("hh:mm tt")</small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-start border-4 border-secondary">
+                                <div class="card-body py-3">
+                                    <h6 class="card-title text-muted mb-1">
+                                        <i class="fas fa-edit me-2"></i>Last Updated
+                                    </h6>
+                                    <p class="card-text mb-0">
+                                        <strong>@Model.UpdatedAt.ToString("MMM dd, yyyy")</strong><br>
+                                        <small class="text-muted">@Model.UpdatedAt.ToString("hh:mm tt")</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Information -->
+                    @if (Model.Status == TaskManagerAPI.Models.TaskStatus.Completed)
+                    {
+                        <div class="alert alert-success">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <i class="fas fa-trophy fa-2x"></i>
+                                </div>
+                                <div class="col-md-11">
+                                    <h6 class="alert-heading mb-2">Task Completed! 🎉</h6>
+                                    <p class="mb-0">
+                                        Great job! This task was completed on 
+                                        <strong>@Model.CompletedAt?.ToString("MMMM dd, yyyy 'at' hh:mm tt")</strong>.
+                                        @if (Model.DueDate.HasValue)
+                                        {
+                                            if (Model.CompletedAt <= Model.DueDate)
+                                            {
+                                                <span class="text-success">✅ Completed on time!</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-warning">⚠️ Completed after due date.</span>
+                                            }
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else if (Model.DueDate.HasValue && Model.DueDate < DateTime.Now)
+                    {
+                        <div class="alert alert-danger">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                </div>
+                                <div class="col-md-11">
+                                    <h6 class="alert-heading mb-2">Task Overdue</h6>
+                                    <p class="mb-0">
+                                        This task was due on <strong>@Model.DueDate.Value.ToString("MMMM dd, yyyy")</strong>. 
+                                        Consider updating the status or adjusting the due date.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="row mt-4">
+                <div class="col-md-3 mb-2">
+                    <div class="d-grid">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg">
+                            <i class="fas fa-edit me-2"></i>Edit Task
+                        </a>
+                    </div>
+                </div>
+                
+                @if (Model.Status != TaskManagerAPI.Models.TaskStatus.Completed)
+                {
+                    <div class="col-md-3 mb-2">
+                        <div class="d-grid">
+                            <form method="post" asp-action="Complete" asp-route-id="@Model.Id" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-lg w-100">
+                                    <i class="fas fa-check me-2"></i>Complete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+                
+                <div class="col-md-3 mb-2">
+                    <div class="d-grid">
+                        <form method="post" asp-action="Delete" asp-route-id="@Model.Id" 
+                              onsubmit="return confirm('Are you sure you want to delete this task?')" class="d-inline">
+                            <button type="submit" class="btn btn-danger btn-lg w-100">
+                                <i class="fas fa-trash me-2"></i>Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="col-md-3 mb-2">
+                    <div class="d-grid">
+                        <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Tasks
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetPriorityColor(TaskManagerAPI.Models.TaskPriority priority)
+    {
+        return priority switch
+        {
+            TaskManagerAPI.Models.TaskPriority.Low => "success",
+            TaskManagerAPI.Models.TaskPriority.Medium => "warning",
+            TaskManagerAPI.Models.TaskPriority.High => "orange",
+            TaskManagerAPI.Models.TaskPriority.Critical => "danger",
+            _ => "secondary"
+        };
+    }
+    
+    string GetStatusColor(TaskManagerAPI.Models.TaskStatus status)
+    {
+        return status switch
+        {
+            TaskManagerAPI.Models.TaskStatus.Pending => "warning",
+            TaskManagerAPI.Models.TaskStatus.InProgress => "info",
+            TaskManagerAPI.Models.TaskStatus.Completed => "success",
+            TaskManagerAPI.Models.TaskStatus.Cancelled => "danger",
+            _ => "secondary"
+        };
+    }
+    
+    string GetPriorityIcon(TaskManagerAPI.Models.TaskPriority priority)
+    {
+        return priority switch
+        {
+            TaskManagerAPI.Models.TaskPriority.Low => "🟢",
+            TaskManagerAPI.Models.TaskPriority.Medium => "🟡",
+            TaskManagerAPI.Models.TaskPriority.High => "🟠",
+            TaskManagerAPI.Models.TaskPriority.Critical => "🔴",
+            _ => "⚪"
+        };
+    }
+    
+    string GetStatusIcon(TaskManagerAPI.Models.TaskStatus status)
+    {
+        return status switch
+        {
+            TaskManagerAPI.Models.TaskStatus.Pending => "📋",
+            TaskManagerAPI.Models.TaskStatus.InProgress => "⚡",
+            TaskManagerAPI.Models.TaskStatus.Completed => "✅",
+            TaskManagerAPI.Models.TaskStatus.Cancelled => "❌",
+            _ => "❓"
+        };
+    }
+} 

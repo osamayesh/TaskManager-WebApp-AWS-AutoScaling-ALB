@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "dgSpecHash": "89RCgZxWfhw=",
+  "success": false,
+  "projectFilePath": "C:\\Users\\osama\\ScalableTaskManager\\TaskManagerAPI\\TaskManagerAPI.csproj",
+  "expectedPackageFiles": [],
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Error",
+      "message": "Failed to download package 'Microsoft.Extensions.Diagnostics.HealthChecks.2.2.0' from 'https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnostics.healthchecks/2.2.0/microsoft.extensions.diagnostics.healthchecks.2.2.0.nupkg'.\r\nNo such host is known. (api.nuget.org:443)\r\n  No such host is known."
+    },
+    {
+      "code": "Undefined",
+      "level": "Error",
+      "message": "Failed to download package 'AspNetCore.HealthChecks.MySql.8.0.1' from 'https://api.nuget.org/v3-flatcontainer/aspnetcore.healthchecks.mysql/8.0.1/aspnetcore.healthchecks.mysql.8.0.1.nupkg'.\r\nNo such host is known. (api.nuget.org:443)\r\n  No such host is known."
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Failed to retrieve information about 'Microsoft.Extensions.Diagnostics.HealthChecks' from remote source 'https://api.nuget.org/v3-flatcontainer/microsoft.extensions.diagnostics.healthchecks/index.json'.\r\n  A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (api.nuget.org:443)\r\n  A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.",
+      "libraryId": "Microsoft.Extensions.Diagnostics.HealthChecks"
+    },
+    {
+      "code": "NU1301",
+      "level": "Error",
+      "message": "Failed to retrieve information about 'AspNetCore.HealthChecks.MySql' from remote source 'https://api.nuget.org/v3-flatcontainer/aspnetcore.healthchecks.mysql/index.json'.\r\n  A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond. (api.nuget.org:443)\r\n  A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond.",
+      "libraryId": "AspNetCore.HealthChecks.MySql"
+    }
+  ]
+}

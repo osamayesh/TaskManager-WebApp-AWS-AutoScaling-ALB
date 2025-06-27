@@ -1,0 +1,187 @@
+@model TaskManagerAPI.Models.DTOs.UpdateTaskDto
+@{
+    ViewData["Title"] = "Edit Task";
+    var taskId = ViewBag.TaskId;
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-edit me-2"></i>Edit Task
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit" asp-route-id="@taskId" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Title" class="form-label fw-bold">
+                                    <i class="fas fa-heading me-1"></i>Task Title
+                                </label>
+                                <input asp-for="Title" class="form-control form-control-lg" 
+                                       placeholder="Enter a descriptive title for your task" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Priority" class="form-label fw-bold">
+                                    <i class="fas fa-exclamation-triangle me-1"></i>Priority
+                                </label>
+                                <select asp-for="Priority" class="form-select form-select-lg">
+                                    <option value="">Keep Current Priority</option>
+                                    <option value="0">🟢 Low</option>
+                                    <option value="1">🟡 Medium</option>
+                                    <option value="2">🟠 High</option>
+                                    <option value="3">🔴 Critical</option>
+                                </select>
+                                <span asp-validation-for="Priority" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label fw-bold">
+                                <i class="fas fa-align-left me-1"></i>Description
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="5" 
+                                      placeholder="Add a detailed description of what needs to be done..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Status" class="form-label fw-bold">
+                                    <i class="fas fa-tasks me-1"></i>Status
+                                </label>
+                                <select asp-for="Status" class="form-select form-select-lg">
+                                    <option value="">Keep Current Status</option>
+                                    <option value="0">📋 Pending</option>
+                                    <option value="1">⚡ In Progress</option>
+                                    <option value="2">✅ Completed</option>
+                                    <option value="3">❌ Cancelled</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="DueDate" class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-1"></i>Due Date
+                                </label>
+                                <input asp-for="DueDate" type="datetime-local" class="form-control form-control-lg" />
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Leave empty to keep current due date
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Change Info -->
+                        <div class="alert alert-info">
+                            <div class="row align-items-center">
+                                <div class="col-md-1 text-center">
+                                    <i class="fas fa-info-circle fa-2x"></i>
+                                </div>
+                                <div class="col-md-11">
+                                    <h6 class="alert-heading mb-2">Update Guidelines</h6>
+                                    <ul class="small mb-0">
+                                        <li><strong>Leave fields empty</strong> to keep current values unchanged</li>
+                                        <li><strong>Marking as completed</strong> will automatically set completion date</li>
+                                        <li><strong>Status changes</strong> are tracked for progress monitoring</li>
+                                        <li><strong>Due date changes</strong> help maintain realistic deadlines</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-save me-2"></i>Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-grid gap-2">
+                                    <a asp-action="Details" asp-route-id="@taskId" class="btn btn-outline-info btn-lg">
+                                        <i class="fas fa-eye me-2"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-grid gap-2">
+                                    <a asp-action="Index" class="btn btn-outline-secondary btn-lg">
+                                        <i class="fas fa-arrow-left me-2"></i>Back to Tasks
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="card border-success">
+                        <div class="card-body text-center p-3">
+                            <form method="post" asp-action="Complete" asp-route-id="@taskId" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="fas fa-check me-1"></i>Mark Complete
+                                </button>
+                            </form>
+                            <small class="d-block text-muted mt-1">Quick completion</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-danger">
+                        <div class="card-body text-center p-3">
+                            <form method="post" asp-action="Delete" asp-route-id="@taskId" 
+                                  onsubmit="return confirm('Are you sure you want to delete this task?')" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash me-1"></i>Delete Task
+                                </button>
+                            </form>
+                            <small class="d-block text-muted mt-1">Permanent removal</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Auto-focus on title field
+        document.getElementById('Title').focus();
+        
+        // Set minimum date to today for due date
+        const dueDateInput = document.getElementById('DueDate');
+        if (dueDateInput) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            dueDateInput.min = now.toISOString().slice(0, 16);
+        }
+        
+        // Add confirmation for status changes to completed
+        const statusSelect = document.getElementById('Status');
+        if (statusSelect) {
+            statusSelect.addEventListener('change', function() {
+                if (this.value === '2') {
+                    if (!confirm('Marking this task as completed will set the completion date. Continue?')) {
+                        this.value = '';
+                    }
+                }
+            });
+        }
+    </script>
+} 
