@@ -178,4 +178,4 @@ graph TB
     class CloudFront cdn
     class Route53 dns
     class SystemsManager management
-    class Users,Internet client 
+    class Users,Internet client

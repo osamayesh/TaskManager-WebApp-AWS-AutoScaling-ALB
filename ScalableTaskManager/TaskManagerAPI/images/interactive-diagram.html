@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskManager AWS Architecture - Interactive Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #232f3e;
+            padding: 15px 20px;
+            border-bottom: 3px solid #ff9900;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .header h1 {
+            color: #ff9900;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        .controls {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(35, 47, 62, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #ff9900;
+        }
+
+        .controls h3 {
+            color: #ff9900;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .format-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .format-btn {
+            background: #ff9900;
+            color: #232f3e;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .format-btn:hover {
+            background: #ffad33;
+            transform: translateY(-2px);
+        }
+
+        .format-btn.active {
+            background: #cc7700;
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.5);
+        }
+
+        .zoom-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .zoom-btn {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .zoom-btn:hover {
+            background: #357abd;
+        }
+
+        .diagram-container {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 300px;
+            bottom: 0;
+            overflow: auto;
+            background: #f5f5f5;
+            border: 2px solid #ff9900;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+        .diagram-viewer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100%;
+            padding: 20px;
+        }
+
+        .diagram-image {
+            max-width: none;
+            height: auto;
+            transition: transform 0.3s ease;
+            cursor: move;
+            border-radius: 10px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .diagram-svg {
+            width: 100%;
+            height: auto;
+            min-width: 1200px;
+        }
+
+        .info-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(35, 47, 62, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #4a90e2;
+            max-width: 280px;
+        }
+
+        .info-panel h4 {
+            color: #4a90e2;
+            margin-bottom: 10px;
+        }
+
+        .info-panel ul {
+            list-style: none;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .info-panel li {
+            margin-bottom: 5px;
+            color: #cccccc;
+        }
+
+        .format-info {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid #4caf50;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 12px;
+            color: #4caf50;
+        }
+
+        @media (max-width: 768px) {
+            .controls, .info-panel {
+                position: static;
+                margin: 10px;
+            }
+            
+            .diagram-container {
+                right: 0;
+                top: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏗️ TaskManager Multi-Tier AWS Architecture</h1>
+        <p>Interactive diagram with zoom, pan, and multiple format support</p>
+    </div>
+
+    <div class="controls">
+        <h3>📊 Diagram Formats</h3>
+        <div class="format-selector">
+            <button class="format-btn active" onclick="switchFormat('standard')">
+                📱 Standard PNG<br>
+                <small>1200x800px - 76KB</small>
+            </button>
+            <button class="format-btn" onclick="switchFormat('hd')">
+                🖥️ HD PNG<br>
+                <small>2400x1600px - 207KB</small>
+            </button>
+            <button class="format-btn" onclick="switchFormat('svg')">
+                🔍 Vector SVG<br>
+                <small>Infinite Zoom - 78KB</small>
+            </button>
+        </div>
+
+        <h3>🔍 Zoom Controls</h3>
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomIn()">🔍 Zoom In</button>
+            <button class="zoom-btn" onclick="zoomOut()">🔍 Zoom Out</button>
+            <button class="zoom-btn" onclick="resetZoom()">🔄 Reset</button>
+            <button class="zoom-btn" onclick="fitToScreen()">📐 Fit Screen</button>
+        </div>
+    </div>
+
+    <div class="diagram-container" id="diagramContainer">
+        <div class="diagram-viewer">
+            <img id="diagramImage" 
+                 src="aws-architecture-diagram.png" 
+                 alt="TaskManager AWS Architecture" 
+                 class="diagram-image">
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h4>🎯 Architecture Components</h4>
+        <ul>
+            <li>🌐 <strong>VPC:</strong> 10.0.0.0/16 Multi-AZ</li>
+            <li>⚖️ <strong>ALB:</strong> Internet-facing Load Balancer</li>
+            <li>🔄 <strong>Auto Scaling:</strong> 1-5 instances (t3.medium)</li>
+            <li>🗄️ <strong>RDS MySQL:</strong> Multi-AZ (db.t3.micro)</li>
+            <li>⚡ <strong>ElastiCache:</strong> Redis clusters</li>
+            <li>🪣 <strong>S3:</strong> Static assets & backups</li>
+            <li>🔐 <strong>Secrets Manager:</strong> Credential storage</li>
+            <li>📊 <strong>CloudWatch:</strong> Monitoring & alerts</li>
+        </ul>
+        
+        <div class="format-info" id="formatInfo">
+            <strong>Standard PNG:</strong> Good balance of quality and file size. Suitable for most documentation needs.
+        </div>
+    </div>
+
+    <script>
+        let currentZoom = 1;
+        let currentFormat = 'standard';
+        let isDragging = false;
+        let startX, startY, scrollLeft, scrollTop;
+
+        const diagramImage = document.getElementById('diagramImage');
+        const diagramContainer = document.getElementById('diagramContainer');
+        const formatInfo = document.getElementById('formatInfo');
+
+        // Format switching
+        function switchFormat(format) {
+            currentFormat = format;
+            
+            // Update active button
+            document.querySelectorAll('.format-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Update image source and info
+            switch(format) {
+                case 'standard':
+                    diagramImage.src = 'aws-architecture-diagram.png';
+                    formatInfo.innerHTML = '<strong>Standard PNG:</strong> Good balance of quality and file size. Suitable for most documentation needs.';
+                    break;
+                case 'hd':
+                    diagramImage.src = 'aws-architecture-diagram-hd.png';
+                    formatInfo.innerHTML = '<strong>HD PNG:</strong> High resolution for detailed viewing and professional presentations. Best for zooming.';
+                    break;
+                case 'svg':
+                    diagramImage.src = 'aws-architecture-diagram.svg';
+                    formatInfo.innerHTML = '<strong>Vector SVG:</strong> Infinite zoom without quality loss. Perfect for interactive exploration.';
+                    break;
+            }
+            
+            resetZoom();
+        }
+
+        // Zoom functions
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom * 1.2, 5);
+            applyZoom();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom / 1.2, 0.1);
+            applyZoom();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            applyZoom();
+            diagramContainer.scrollTo(0, 0);
+        }
+
+        function fitToScreen() {
+            const containerWidth = diagramContainer.clientWidth - 40;
+            const containerHeight = diagramContainer.clientHeight - 40;
+            const imageWidth = diagramImage.naturalWidth || 1200;
+            const imageHeight = diagramImage.naturalHeight || 800;
+            
+            const scaleX = containerWidth / imageWidth;
+            const scaleY = containerHeight / imageHeight;
+            currentZoom = Math.min(scaleX, scaleY, 1);
+            
+            applyZoom();
+        }
+
+        function applyZoom() {
+            diagramImage.style.transform = `scale(${currentZoom})`;
+            diagramImage.style.transformOrigin = 'center center';
+        }
+
+        // Drag functionality
+        diagramContainer.addEventListener('mousedown', (e) => {
+            if (e.target === diagramImage) {
+                isDragging = true;
+                startX = e.pageX - diagramContainer.offsetLeft;
+                startY = e.pageY - diagramContainer.offsetTop;
+                scrollLeft = diagramContainer.scrollLeft;
+                scrollTop = diagramContainer.scrollTop;
+                diagramContainer.style.cursor = 'grabbing';
+            }
+        });
+
+        diagramContainer.addEventListener('mouseleave', () => {
+            isDragging = false;
+            diagramContainer.style.cursor = 'default';
+        });
+
+        diagramContainer.addEventListener('mouseup', () => {
+            isDragging = false;
+            diagramContainer.style.cursor = 'default';
+        });
+
+        diagramContainer.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const x = e.pageX - diagramContainer.offsetLeft;
+            const y = e.pageY - diagramContainer.offsetTop;
+            const walkX = (x - startX) * 2;
+            const walkY = (y - startY) * 2;
+            diagramContainer.scrollLeft = scrollLeft - walkX;
+            diagramContainer.scrollTop = scrollTop - walkY;
+        });
+
+        // Scroll zoom
+        diagramContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (e.deltaY < 0) {
+                zoomIn();
+            } else {
+                zoomOut();
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case '=':
+                case '+':
+                    zoomIn();
+                    break;
+                case '-':
+                    zoomOut();
+                    break;
+                case '0':
+                    resetZoom();
+                    break;
+                case 'f':
+                case 'F':
+                    fitToScreen();
+                    break;
+            }
+        });
+
+        // Initialize
+        diagramImage.onload = () => {
+            fitToScreen();
+        };
+    </script>
+</body>
+</html> 
