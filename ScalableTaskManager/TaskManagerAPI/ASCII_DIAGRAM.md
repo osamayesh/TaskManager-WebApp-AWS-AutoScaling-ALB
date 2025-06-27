@@ -1,95 +1,144 @@
-# 🎨 ASCII Art AWS Architecture Diagram
+#  Comprehensive TaskManager AWS Infrastructure ASCII Diagram
+
+##  **AWS Region: us-east-1 (N. Virginia)**
 
 ```
-                                TaskManager AWS Architecture
-    ╔══════════════════════════════════════════════════════════════════════════════════╗
-    ║                                ☁️  AWS CLOUD                                      ║
-    ║                                                                                  ║
-    ║    👥 Client                                                                     ║
-    ║       │                                                                         ║
-    ║       │ HTTPS                                                                   ║
-    ║       ▼                                                                         ║
-    ║  ┌─────────────┐       ┌─────────────────┐       ┌──────────────┐              ║
-    ║  │     1️⃣      │       │       2️⃣        │       │      3️⃣       │              ║
-    ║  │     🌐      │ ────▶ │       🔄        │ ────▶ │      🟠       │              ║
-    ║  │  Internet   │       │ Application     │       │   Amazon EC2  │              ║
-    ║  │   Gateway   │       │ Load Balancer   │       │   t3.medium   │              ║
-    ║  │             │       │                 │       │  Auto Scaling │              ║
-    ║  └─────────────┘       └─────────────────┘       └──────────────┘              ║
-    ║                                                           │                      ║
-    ║                                                           │ TCP:3306            ║
-    ║                                                           ▼                      ║
-    ║                                                  ┌─────────────────┐            ║
-    ║                                                  │       4️⃣        │            ║
-    ║                                                  │       🗄️        │            ║
-    ║                                                  │   Amazon RDS    │            ║
-    ║                                                  │   MySQL 8.0     │            ║
-    ║                                                  │   Multi-AZ      │            ║
-    ║                                                  └─────────────────┘            ║
-    ║                                                                                  ║
-    ║  ╔════════════════════════════════════════════════════════════════════════════╗  ║
-    ║  ║                        Supporting Services                                 ║  ║
-    ║  ╚════════════════════════════════════════════════════════════════════════════╝  ║
-    ║                                                                                  ║
-    ║  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐    ║
-    ║  │      🏗️      │   │      🔐      │   │      📈      │   │      📧      │    ║
-    ║  │  Amazon VPC  │   │   AWS IAM    │   │  CloudWatch  │   │  Amazon SNS  │    ║
-    ║  │ 10.0.0.0/16  │   │ Roles & Pols │   │ Logs/Metrics │   │ Email Alerts │    ║
-    ║  │              │   │              │   │              │   │              │    ║
-    ║  └──────────────┘   └──────────────┘   └──────────────┘   └──────────────┘    ║
-    ║         │                   │                   ▲                   ▲          ║
-    ║         │ Network           │ Security          │ Monitoring        │ Alerts   ║
-    ║         │ (dotted)          │ (dotted)          │ (solid)           │ (solid)  ║
-    ║         ▼                   ▼                   │                   │          ║
-    ║  ┌─────────────────────────────────────────────────────────────────────────┐   ║
-    ║  │                    Resource Connections                                │   ║
-    ║  │                                                                         │   ║
-    ║  │  VPC ┄┄┄┄▶ ALB, EC2, RDS    (Network Infrastructure)                  │   ║
-    ║  │  IAM ┄┄┄┄▶ EC2, RDS          (Security & Permissions)                 │   ║
-    ║  │  EC2, RDS, ALB ────▶ CloudWatch  (Monitoring Data)                    │   ║
-    ║  │  CloudWatch ────▶ SNS             (Alert Notifications)               │   ║
-    ║  │                                                                         │   ║
-    ║  └─────────────────────────────────────────────────────────────────────────┘   ║
-    ║                                                                                  ║
-    ╚══════════════════════════════════════════════════════════════════════════════════╝
+                  TaskManager AWS Infrastructure - ACTUAL DEPLOYMENT
+    
+                                   AWS us-east-1 Region                          
+                                                                                   
+         Internet Users                                                          
+                                                                                  
+            HTTPS/HTTP                                                            
+                                                                                  
+                                                            
+               1                                                                 
+                                                                               
+         Internet Gateway                                                        
+         (taskmanager_igw)                                                       
+                                                            
+                                                                                  
+                                                                                  
+       
+                               VPC: 10.0.0.0/16                                
+                            (taskmanager_vpc)                                    
+                                                                                  
+          
+                             PUBLIC TIER                                     
+                                                                               
+                                 
+             AZ: us-east-1a             AZ: us-east-1b                     
+            Public Subnet 1          Public Subnet 2                   
+             10.0.1.0/24                10.0.2.0/24                        
+                                 
+                                                                             
+          
+                                                                               
+                                                     
+                                                                                
+          
+                      2 APPLICATION LOAD BALANCER                            
+                                                                               
+                 ALB: taskmanager-alb                                       
+                 Target Group: taskmanager_tg                               
+                 HTTP/HTTPS Listener                                        
+                 Security Group: alb_sg                                     
+          
+                                                                                
+                                      Forward to Target Group                   
+                                                                                
+          
+                            PRIVATE TIER - COMPUTE                           
+                                                                               
+                                 
+             AZ: us-east-1a             AZ: us-east-1b                     
+            Private Subnet 1         Private Subnet 2                  
+             10.0.3.0/24                10.0.4.0/24                        
+                                                                           
+            3 AUTO SCALING            3 AUTO SCALING                     
+                                                                           
+            EC2: t3.medium           EC2: t3.medium                    
+            Launch Template          Launch Template                   
+            Min: 1, Max: 5           Min: 1, Max: 5                    
+            Desired: 2               Desired: 2                        
+            Security: ec2_sg          Security: ec2_sg                   
+                                 
+          
+                                                                                
+                                      MySQL Connection (Port 3306)             
+                                                                                
+          
+                           PRIVATE TIER - DATABASE                           
+                                                                               
+                         4 AMAZON RDS MYSQL 8.0                             
+                                                                               
+                 Instance: db.t3.micro                                     
+                 Multi-AZ: TRUE (us-east-1a + us-east-1b)                  
+                 DB Subnet Group: taskmanager_db_subnet_group               
+                 Security Group: rds_sg                                     
+                 Backup: 7-day retention                                    
+                 Encryption: At rest                                        
+          
+       
+                                                                                   
+       
+                                 SUPPORTING SERVICES                            
+       
+                                                                                   
+             
+                                                                 
+        AWS IAM          CloudWatch       Amazon SNS      Route Tables   
+                                                                         
+        EC2 Role        CPU Alarms      Scale           Public RT    
+        Instance        Memory           Alerts          Route to     
+         Profile          Alarms          Health           IGW          
+        RDS Access      Health           Alerts          0.0.0.0/0    
+                          Checks          Email: Conf                   
+             
+                                                                                   
+    
 
-    ┌─────────────────────────────────────────────────────────────────────────────────┐
-    │                             Legend & Service Details                             │
-    ├─────────────────────────────────────────────────────────────────────────────────┤
-    │ 1️⃣ Internet Gateway: Public internet access entry point                         │
-    │ 2️⃣ Application Load Balancer: HTTP/HTTPS traffic distribution & health checks   │
-    │ 3️⃣ Amazon EC2: .NET Core app hosting with auto scaling (1-5 t3.medium)         │
-    │ 4️⃣ Amazon RDS: MySQL database with Multi-AZ deployment & encryption            │
-    │                                                                                 │
-    │ 🏗️  Amazon VPC: Virtual private cloud network (10.0.0.0/16)                   │
-    │ 🔐 AWS IAM: Identity and access management roles                               │
-    │ 📈 CloudWatch: Monitoring, logging, and metrics collection                    │
-    │ 📧 Amazon SNS: Email notifications for scaling and health alerts              │
-    │                                                                                 │
-    │ ──▶  Solid arrows: Data flow                                                  │
-    │ ┄┄▶  Dotted arrows: Infrastructure/security relationships                     │
-    └─────────────────────────────────────────────────────────────────────────────────┘
+    ─
+                           INFRASTRUCTURE SPECIFICATIONS                       
+    
+                                                                                 
+      REGION & AVAILABILITY                                                    
+        Region: us-east-1 (N. Virginia)                                        
+        Availability Zones: us-east-1a, us-east-1b                             
+        Multi-AZ Deployment: TRUE (High Availability)                          
+                                                                                 
+      NETWORKING ARCHITECTURE                                                  
+        VPC CIDR: 10.0.0.0/16 (65,536 IP addresses)                           
+        Public Subnets: 10.0.1.0/24 (us-east-1a), 10.0.2.0/24 (us-east-1b)  
+        Private Subnets: 10.0.3.0/24 (us-east-1a), 10.0.4.0/24 (us-east-1b) 
+        Internet Gateway: taskmanager_igw                                      
+                                                                                 
+      LOAD BALANCING & SCALING                                                 
+        ALB Name: taskmanager-alb (Application Load Balancer)                  
+        Target Group: taskmanager_tg                                           
+        Auto Scaling Group: taskmanager_asg                                    
+        Launch Template: taskmanager_lt                                        
+        Scaling: Min=1, Max=5, Desired=2 instances                             
+        Instance Type: t3.medium                                               
+                                                                                 
+      DATABASE CONFIGURATION                                                  
+        Engine: MySQL 8.0                                                      
+        Instance Class: db.t3.micro                                            
+        Multi-AZ: TRUE (automatic failover)                                    
+        Subnet Group: taskmanager_db_subnet_group                              
+        Backup Retention: 7 days                                               
+                                                                                 
+      SECURITY CONFIGURATION                                                   
+        ALB Security Group: alb_sg (HTTP/HTTPS from 0.0.0.0/0)                
+        EC2 Security Group: ec2_sg (HTTP from ALB, SSH from anywhere)         
+        RDS Security Group: rds_sg (MySQL 3306 from EC2 only)                 
+        IAM Role: taskmanager_ec2_role + taskmanager_ec2_profile               
+                                                                                 
+      MONITORING & ALERTS                                                      
+        CloudWatch Alarms: CPU High/Low, Memory, Health Checks, RDS CPU       
+        Auto Scaling Policies: CPU-based scale up/down                         
+        SNS Topic: taskmanager_alerts                                          
+        Email Notifications: Configurable via alert_email variable            
+                                                                                 
+    
 ```
-
-## Alternative Compact View:
-
-```
-       Client
-         │
-         ▼
-    [1️⃣ IGW] ──▶ [2️⃣ ALB] ──▶ [3️⃣ EC2] ──▶ [4️⃣ RDS]
-         │            │            │            │
-         │            │            ▼            │
-         │            │       [📈 CloudWatch] ──┘
-         │            │            │
-         │            │            ▼
-         │            │       [📧 SNS]
-         │            │
-    [🏗️ VPC] ─────────┴────────────┘
-         │
-    [🔐 IAM] ─────────────────────────────────────┘
-
-Legend:
-IGW = Internet Gateway    ALB = App Load Balancer
-EC2 = Amazon EC2         RDS = Amazon RDS MySQL
-VPC = Virtual Private Cloud    IAM = Identity Access Management
