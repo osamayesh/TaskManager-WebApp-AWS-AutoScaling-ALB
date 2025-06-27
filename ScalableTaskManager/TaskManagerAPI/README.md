@@ -16,61 +16,63 @@ This project implements a **3-tier AWS architecture** with high availability, au
 
 ```mermaid
 graph LR
-    %% External Users
-    Users["👥<br/>Users"]
+    %% Client
+    Client["👥<br/>Client"]
     
-    %% AWS Cloud Services with specific icons
+    %% AWS Cloud
     subgraph AWS["☁️ AWS Cloud"]
         
-        %% Main data flow with AWS service icons
-        IGW["1️⃣<br/>🌐<br/>Internet Gateway"]
-        ALB["2️⃣<br/>🔄<br/>Application Load Balancer"]
-        EC2["3️⃣<br/>🟠<br/>Amazon EC2<br/>Auto Scaling"]
-        RDS["4️⃣<br/>🗄️<br/>Amazon RDS<br/>MySQL"]
-        
-        %% Supporting Services with specific AWS icons
-        subgraph Support["AWS Supporting Services"]
-            VPC["🏗️<br/>Amazon VPC<br/>Networking"]
-            IAM["🔐<br/>AWS IAM<br/>Identity & Access"]
-            CW["📈<br/>CloudWatch<br/>Monitoring"]
-            SNS["📨<br/>Amazon SNS<br/>Notifications"]
+        %% Main Architecture Flow (4 steps)
+        subgraph MainFlow["TaskManager AWS Architecture"]
+            direction LR
+            IGW["1️⃣<br/>🌐<br/>Internet<br/>Gateway"]
+            ALB["2️⃣<br/>🔄<br/>Application<br/>Load Balancer"]
+            EC2["3️⃣<br/>🟠<br/>Amazon EC2<br/>t3.medium<br/>Auto Scaling"]
+            RDS["4️⃣<br/>🗄️<br/>Amazon RDS<br/>MySQL 8.0<br/>Multi-AZ"]
         end
         
+        %% Supporting Services
+        subgraph Support["Supporting Services"]
+            VPC["🏗️<br/>Amazon VPC<br/>10.0.0.0/16"]
+            IAM["🔐<br/>AWS IAM<br/>Roles & Policies"]
+            CloudWatch["📈<br/>CloudWatch<br/>Logs & Metrics"]
+            SNS["📧<br/>Amazon SNS<br/>Email Alerts"]
+        end
     end
     
-    %% Data Flow
-    Users --> IGW
+    %% Main data flow (solid arrows)
+    Client --> IGW
     IGW --> ALB
     ALB --> EC2
     EC2 --> RDS
     
-    %% Monitoring & Management
-    EC2 --> CW
-    RDS --> CW
-    ALB --> CW
-    CW --> SNS
+    %% Monitoring flow (solid arrows)
+    EC2 --> CloudWatch
+    RDS --> CloudWatch
+    ALB --> CloudWatch
+    CloudWatch --> SNS
     
-    %% Security & Infrastructure
-    IAM -.-> EC2
-    IAM -.-> RDS
+    %% Infrastructure relationships (dotted arrows)
     VPC -.-> ALB
     VPC -.-> EC2
     VPC -.-> RDS
+    IAM -.-> EC2
+    IAM -.-> RDS
     
-    %% AWS Service Color Styling
-    classDef awsCompute fill:#FF9900,stroke:#232F3E,stroke-width:3px,color:#FFFFFF
-    classDef awsDatabase fill:#3F48CC,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
-    classDef awsNetwork fill:#8C4FFF,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
-    classDef awsMonitoring fill:#759C3E,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
-    classDef awsManagement fill:#FF4B4B,stroke:#FFFFFF,stroke-width:3px,color:#FFFFFF
-    classDef userAccess fill:#34495E,stroke:#2C3E50,stroke-width:2px,color:#FFFFFF
+    %% AWS Service Colors (Official AWS Colors)
+    classDef compute fill:#FF9900,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
+    classDef database fill:#3F48CC,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
+    classDef networking fill:#8C4FFF,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
+    classDef monitoring fill:#759C3E,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
+    classDef security fill:#FF4B4B,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
+    classDef client fill:#232F3E,stroke:#FF9900,stroke-width:2px,color:#FFFFFF
     
-    class EC2 awsCompute
-    class RDS awsDatabase
-    class IGW,ALB,VPC awsNetwork
-    class CW,SNS awsMonitoring
-    class IAM awsManagement
-    class Users userAccess
+    class EC2 compute
+    class RDS database  
+    class IGW,ALB,VPC networking
+    class CloudWatch,SNS monitoring
+    class IAM security
+    class Client client
 ```
 
 ### **🎨 Professional Lucidchart Diagram**
