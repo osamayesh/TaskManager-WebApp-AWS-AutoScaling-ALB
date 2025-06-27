@@ -12,6 +12,8 @@ A scalable, cloud-native Task Manager API built with **.NET Core** and deployed 
 
 This project implements a **3-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
 
+### **📊 Interactive Mermaid Diagram**
+
 ```mermaid
 graph LR
     %% External Users
@@ -70,6 +72,19 @@ graph LR
     class IAM awsManagement
     class Users userAccess
 ```
+
+### **🎨 Professional Lucidchart Diagram**
+
+<!-- Replace this section with your Lucidchart diagram once created -->
+![AWS Architecture Diagram](./images/aws-architecture-diagram.png)
+
+*High-resolution AWS architecture diagram created with Lucidchart showing the complete infrastructure setup.*
+
+**🔗 Interactive Diagram Links:**
+- **Lucidchart Live Diagram**: [View Interactive Diagram](https://lucid.app/your-diagram-link) *(Replace with your actual link)*
+- **Download High-Res**: [Download PNG](./images/aws-architecture-diagram.png)
+
+---
 
 ## 🚀 Features
 
