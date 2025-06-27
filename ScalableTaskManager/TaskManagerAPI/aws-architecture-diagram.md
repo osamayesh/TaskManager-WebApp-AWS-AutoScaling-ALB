@@ -57,8 +57,9 @@ graph LR
     classDef security fill:#FF4B4B,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
     classDef client fill:#232F3E,stroke:#FF9900,stroke-width:2px,color:#FFFFFF
     
+    %% Apply classes to nodes
     class EC2 compute
-    class RDS database  
+    class RDS database
     class IGW,ALB,VPC networking
     class CloudWatch,SNS monitoring
     class IAM security
@@ -119,4 +120,4 @@ graph LR
 3. **Deploy**: Run `terraform apply` in the `aws-infrastructure/terraform/` directory
 4. **Access**: Use the ALB DNS name output for application access
 
-For detailed deployment instructions, see the [deployment documentation](./aws-infrastructure/README.md). 
+For detailed deployment instructions, see the [deployment documentation](./aws-infrastructure/README.md).
