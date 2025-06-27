@@ -107,6 +107,88 @@ resource "aws_route_table_association" "public_2" {
   route_table_id = aws_route_table.public_rt.id
 }
 
+# Elastic IPs for NAT Gateways
+resource "aws_eip" "nat_1" {
+  domain = "vpc"
+  depends_on = [aws_internet_gateway.taskmanager_igw]
+
+  tags = {
+    Name = "TaskManager-NAT-EIP-1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_eip" "nat_2" {
+  domain = "vpc"
+  depends_on = [aws_internet_gateway.taskmanager_igw]
+
+  tags = {
+    Name = "TaskManager-NAT-EIP-2"
+    Environment = var.environment
+  }
+}
+
+# NAT Gateways
+resource "aws_nat_gateway" "nat_1" {
+  allocation_id = aws_eip.nat_1.id
+  subnet_id     = aws_subnet.public_subnet_1.id
+
+  tags = {
+    Name = "TaskManager-NAT-Gateway-1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_nat_gateway" "nat_2" {
+  allocation_id = aws_eip.nat_2.id
+  subnet_id     = aws_subnet.public_subnet_2.id
+
+  tags = {
+    Name = "TaskManager-NAT-Gateway-2"
+    Environment = var.environment
+  }
+}
+
+# Private Route Tables
+resource "aws_route_table" "private_rt_1" {
+  vpc_id = aws_vpc.taskmanager_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_1.id
+  }
+
+  tags = {
+    Name = "TaskManager-Private-RT-1"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table" "private_rt_2" {
+  vpc_id = aws_vpc.taskmanager_vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_2.id
+  }
+
+  tags = {
+    Name = "TaskManager-Private-RT-2"
+    Environment = var.environment
+  }
+}
+
+# Private Route Table Associations
+resource "aws_route_table_association" "private_1" {
+  subnet_id      = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.private_rt_1.id
+}
+
+resource "aws_route_table_association" "private_2" {
+  subnet_id      = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.private_rt_2.id
+}
+
 # Security Groups
 resource "aws_security_group" "alb_sg" {
   name_prefix = "taskmanager-alb-sg"
@@ -183,6 +265,49 @@ resource "aws_security_group" "rds_sg" {
 
   tags = {
     Name = "TaskManager-RDS-SG"
+    Environment = var.environment
+  }
+}
+
+# Security Group for ElastiCache
+resource "aws_security_group" "elasticache_sg" {
+  name_prefix = "taskmanager-elasticache-sg"
+  vpc_id      = aws_vpc.taskmanager_vpc.id
+
+  ingress {
+    from_port       = 6379
+    to_port         = 6379
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ec2_sg.id]
+  }
+
+  tags = {
+    Name = "TaskManager-ElastiCache-SG"
+    Environment = var.environment
+  }
+}
+
+# Security Group for VPC Endpoints
+resource "aws_security_group" "vpc_endpoint_sg" {
+  name_prefix = "taskmanager-vpc-endpoint-sg"
+  vpc_id      = aws_vpc.taskmanager_vpc.id
+
+  ingress {
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    security_groups = [aws_security_group.ec2_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "TaskManager-VPC-Endpoint-SG"
     Environment = var.environment
   }
 }
@@ -280,6 +405,206 @@ resource "aws_db_instance" "taskmanager_db" {
 
   tags = {
     Name = "TaskManager-DB"
+    Environment = var.environment
+  }
+}
+
+# ElastiCache Subnet Group
+resource "aws_elasticache_subnet_group" "taskmanager_cache_subnet_group" {
+  name       = "taskmanager-cache-subnet-group"
+  subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
+
+  tags = {
+    Name = "TaskManager-Cache-Subnet-Group"
+    Environment = var.environment
+  }
+}
+
+# ElastiCache Redis Cluster
+resource "aws_elasticache_replication_group" "taskmanager_redis" {
+  replication_group_id       = "taskmanager-redis"
+  description                = "TaskManager Redis cluster for session management and caching"
+  
+  node_type                  = "cache.t3.micro"
+  port                       = 6379
+  parameter_group_name       = "default.redis7"
+  
+  num_cache_clusters         = 2
+  automatic_failover_enabled = true
+  multi_az_enabled           = true
+  
+  subnet_group_name = aws_elasticache_subnet_group.taskmanager_cache_subnet_group.name
+  security_group_ids = [aws_security_group.elasticache_sg.id]
+  
+  at_rest_encryption_enabled = true
+  transit_encryption_enabled = true
+
+  tags = {
+    Name = "TaskManager-Redis"
+    Environment = var.environment
+  }
+}
+
+# S3 Bucket for Static Assets and Backups
+resource "aws_s3_bucket" "taskmanager_assets" {
+  bucket = "taskmanager-assets-${random_string.bucket_suffix.result}"
+
+  tags = {
+    Name = "TaskManager-Assets"
+    Environment = var.environment
+  }
+}
+
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+# S3 Bucket Versioning
+resource "aws_s3_bucket_versioning" "taskmanager_assets_versioning" {
+  bucket = aws_s3_bucket.taskmanager_assets.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# S3 Bucket Encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "taskmanager_assets_encryption" {
+  bucket = aws_s3_bucket.taskmanager_assets.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+# S3 Bucket Public Access Block
+resource "aws_s3_bucket_public_access_block" "taskmanager_assets_pab" {
+  bucket = aws_s3_bucket.taskmanager_assets.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# AWS Secrets Manager Secret for Database Credentials
+resource "aws_secretsmanager_secret" "db_credentials" {
+  name                    = "taskmanager/database/credentials"
+  description             = "Database credentials for TaskManager application"
+  recovery_window_in_days = 7
+
+  tags = {
+    Name = "TaskManager-DB-Credentials"
+    Environment = var.environment
+  }
+}
+
+resource "aws_secretsmanager_secret_version" "db_credentials_version" {
+  secret_id = aws_secretsmanager_secret.db_credentials.id
+  secret_string = jsonencode({
+    username = var.db_username
+    password = var.db_password
+    endpoint = aws_db_instance.taskmanager_db.endpoint
+    port     = aws_db_instance.taskmanager_db.port
+    dbname   = aws_db_instance.taskmanager_db.db_name
+  })
+}
+
+# VPC Endpoints for AWS Services
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id       = aws_vpc.taskmanager_vpc.id
+  service_name = "com.amazonaws.${var.aws_region}.s3"
+  
+  route_table_ids = [
+    aws_route_table.private_rt_1.id,
+    aws_route_table.private_rt_2.id
+  ]
+
+  tags = {
+    Name = "TaskManager-S3-VPC-Endpoint"
+    Environment = var.environment
+  }
+}
+
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = aws_vpc.taskmanager_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  
+  subnet_ids = [
+    aws_subnet.private_subnet_1.id,
+    aws_subnet.private_subnet_2.id
+  ]
+  
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+  
+  private_dns_enabled = true
+
+  tags = {
+    Name = "TaskManager-SecretsManager-VPC-Endpoint"
+    Environment = var.environment
+  }
+}
+
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id              = aws_vpc.taskmanager_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.ssm"
+  vpc_endpoint_type   = "Interface"
+  
+  subnet_ids = [
+    aws_subnet.private_subnet_1.id,
+    aws_subnet.private_subnet_2.id
+  ]
+  
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+  
+  private_dns_enabled = true
+
+  tags = {
+    Name = "TaskManager-SSM-VPC-Endpoint"
+    Environment = var.environment
+  }
+}
+
+resource "aws_vpc_endpoint" "ssm_messages" {
+  vpc_id              = aws_vpc.taskmanager_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.ssmmessages"
+  vpc_endpoint_type   = "Interface"
+  
+  subnet_ids = [
+    aws_subnet.private_subnet_1.id,
+    aws_subnet.private_subnet_2.id
+  ]
+  
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+  
+  private_dns_enabled = true
+
+  tags = {
+    Name = "TaskManager-SSMMessages-VPC-Endpoint"
+    Environment = var.environment
+  }
+}
+
+resource "aws_vpc_endpoint" "ec2_messages" {
+  vpc_id              = aws_vpc.taskmanager_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.ec2messages"
+  vpc_endpoint_type   = "Interface"
+  
+  subnet_ids = [
+    aws_subnet.private_subnet_1.id,
+    aws_subnet.private_subnet_2.id
+  ]
+  
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+  
+  private_dns_enabled = true
+
+  tags = {
+    Name = "TaskManager-EC2Messages-VPC-Endpoint"
     Environment = var.environment
   }
 }
@@ -383,7 +708,7 @@ resource "aws_iam_role" "taskmanager_ec2_role" {
   }
 }
 
-# IAM Policy for EC2 CloudWatch Access
+# IAM Policy for EC2 Enhanced Access
 resource "aws_iam_role_policy" "taskmanager_ec2_policy" {
   name = "TaskManager-EC2-Policy"
   role = aws_iam_role.taskmanager_ec2_role.id
@@ -402,6 +727,54 @@ resource "aws_iam_role_policy" "taskmanager_ec2_policy" {
           "logs:CreateLogStream",
           "logs:DescribeLogStreams",
           "logs:DescribeLogGroups"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          aws_s3_bucket.taskmanager_assets.arn,
+          "${aws_s3_bucket.taskmanager_assets.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret"
+        ]
+        Resource = aws_secretsmanager_secret.db_credentials.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+          "ssm:GetParameters",
+          "ssm:GetParametersByPath",
+          "ssm:DescribeParameters"
+        ]
+        Resource = "arn:aws:ssm:${var.aws_region}:*:parameter/taskmanager/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:UpdateInstanceInformation",
+          "ssmmessages:CreateControlChannel",
+          "ssmmessages:CreateDataChannel",
+          "ssmmessages:OpenControlChannel",
+          "ssmmessages:OpenDataChannel",
+          "ec2messages:AcknowledgeMessage",
+          "ec2messages:DeleteMessage",
+          "ec2messages:FailMessage",
+          "ec2messages:GetEndpoint",
+          "ec2messages:GetMessages",
+          "ec2messages:SendReply"
         ]
         Resource = "*"
       }
@@ -565,6 +938,52 @@ resource "aws_cloudwatch_metric_alarm" "rds_cpu_high" {
 
   tags = {
     Name = "TaskManager-RDS-CPU-High"
+    Environment = var.environment
+  }
+}
+
+# CloudWatch Alarm for ElastiCache CPU
+resource "aws_cloudwatch_metric_alarm" "elasticache_cpu_high" {
+  alarm_name          = "taskmanager-elasticache-cpu-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/ElastiCache"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "75"
+  alarm_description   = "This metric monitors ElastiCache CPU utilization"
+  alarm_actions       = [aws_sns_topic.taskmanager_alerts.arn]
+
+  dimensions = {
+    CacheClusterId = aws_elasticache_replication_group.taskmanager_redis.id
+  }
+
+  tags = {
+    Name = "TaskManager-ElastiCache-CPU-High"
+    Environment = var.environment
+  }
+}
+
+# CloudWatch Alarm for ElastiCache Memory
+resource "aws_cloudwatch_metric_alarm" "elasticache_memory_high" {
+  alarm_name          = "taskmanager-elasticache-memory-high"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "DatabaseMemoryUsagePercentage"
+  namespace           = "AWS/ElastiCache"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "85"
+  alarm_description   = "This metric monitors ElastiCache memory utilization"
+  alarm_actions       = [aws_sns_topic.taskmanager_alerts.arn]
+
+  dimensions = {
+    CacheClusterId = aws_elasticache_replication_group.taskmanager_redis.id
+  }
+
+  tags = {
+    Name = "TaskManager-ElastiCache-Memory-High"
     Environment = var.environment
   }
 } 

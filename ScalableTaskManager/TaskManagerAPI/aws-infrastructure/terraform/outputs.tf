@@ -78,18 +78,90 @@ output "application_url" {
   value       = "http://${aws_lb.taskmanager_alb.dns_name}"
 }
 
+# Enhanced Infrastructure Outputs
+
+output "nat_gateway_ids" {
+  description = "IDs of the NAT Gateways"
+  value       = [aws_nat_gateway.nat_1.id, aws_nat_gateway.nat_2.id]
+}
+
+output "nat_gateway_ips" {
+  description = "Public IP addresses of the NAT Gateways"
+  value       = [aws_eip.nat_1.public_ip, aws_eip.nat_2.public_ip]
+}
+
+output "elasticache_redis_endpoint" {
+  description = "ElastiCache Redis primary endpoint"
+  value       = aws_elasticache_replication_group.taskmanager_redis.primary_endpoint_address
+}
+
+output "elasticache_redis_port" {
+  description = "ElastiCache Redis port"
+  value       = aws_elasticache_replication_group.taskmanager_redis.port
+}
+
+output "s3_bucket_name" {
+  description = "Name of the S3 bucket for static assets"
+  value       = aws_s3_bucket.taskmanager_assets.bucket
+}
+
+output "s3_bucket_arn" {
+  description = "ARN of the S3 bucket for static assets"
+  value       = aws_s3_bucket.taskmanager_assets.arn
+}
+
+output "secrets_manager_secret_arn" {
+  description = "ARN of the Secrets Manager secret for database credentials"
+  value       = aws_secretsmanager_secret.db_credentials.arn
+}
+
+output "vpc_endpoint_s3_id" {
+  description = "ID of the S3 VPC Endpoint"
+  value       = aws_vpc_endpoint.s3.id
+}
+
+output "vpc_endpoint_secrets_manager_id" {
+  description = "ID of the Secrets Manager VPC Endpoint"
+  value       = aws_vpc_endpoint.secretsmanager.id
+}
+
+output "security_group_elasticache_id" {
+  description = "ID of the ElastiCache security group"
+  value       = aws_security_group.elasticache_sg.id
+}
+
+output "security_group_vpc_endpoint_id" {
+  description = "ID of the VPC Endpoint security group"
+  value       = aws_security_group.vpc_endpoint_sg.id
+}
+
 output "deployment_summary" {
   description = "Summary of deployed AWS services"
   value = {
-    "ALB_DNS"           = aws_lb.taskmanager_alb.dns_name
-    "ASG_Name"          = aws_autoscaling_group.taskmanager_asg.name
-    "ASG_Min_Size"      = aws_autoscaling_group.taskmanager_asg.min_size
-    "ASG_Max_Size"      = aws_autoscaling_group.taskmanager_asg.max_size
-    "ASG_Desired"       = aws_autoscaling_group.taskmanager_asg.desired_capacity
-    "RDS_Endpoint"      = aws_db_instance.taskmanager_db.endpoint
-    "RDS_Multi_AZ"      = aws_db_instance.taskmanager_db.multi_az
-    "SNS_Topic"         = aws_sns_topic.taskmanager_alerts.arn
-    "VPC_ID"            = aws_vpc.taskmanager_vpc.id
-    "Environment"       = var.environment
+    "ALB_DNS"                = aws_lb.taskmanager_alb.dns_name
+    "ASG_Name"               = aws_autoscaling_group.taskmanager_asg.name
+    "ASG_Min_Size"           = aws_autoscaling_group.taskmanager_asg.min_size
+    "ASG_Max_Size"           = aws_autoscaling_group.taskmanager_asg.max_size
+    "ASG_Desired"            = aws_autoscaling_group.taskmanager_asg.desired_capacity
+    "RDS_Endpoint"           = aws_db_instance.taskmanager_db.endpoint
+    "RDS_Multi_AZ"           = aws_db_instance.taskmanager_db.multi_az
+    "ElastiCache_Endpoint"   = aws_elasticache_replication_group.taskmanager_redis.primary_endpoint_address
+    "S3_Bucket"              = aws_s3_bucket.taskmanager_assets.bucket
+    "Secrets_Manager_ARN"    = aws_secretsmanager_secret.db_credentials.arn
+    "NAT_Gateway_IPs"        = [aws_eip.nat_1.public_ip, aws_eip.nat_2.public_ip]
+    "SNS_Topic"              = aws_sns_topic.taskmanager_alerts.arn
+    "VPC_ID"                 = aws_vpc.taskmanager_vpc.id
+    "Environment"            = var.environment
+  }
+}
+
+output "architecture_endpoints" {
+  description = "Key endpoints for the multi-tier architecture"
+  value = {
+    "Application_URL"        = "http://${aws_lb.taskmanager_alb.dns_name}"
+    "Database_Endpoint"      = aws_db_instance.taskmanager_db.endpoint
+    "Cache_Endpoint"         = aws_elasticache_replication_group.taskmanager_redis.primary_endpoint_address
+    "S3_Bucket"              = aws_s3_bucket.taskmanager_assets.bucket
+    "Secrets_Manager_Secret" = aws_secretsmanager_secret.db_credentials.name
   }
 } 
