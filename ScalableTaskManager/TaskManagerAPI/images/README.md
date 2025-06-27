@@ -2,16 +2,58 @@
 
 This directory contains visual representations of the TaskManager API AWS architecture.
 
+## 🚨 **Quick Fix for 404 Error**
+
+If you're getting a **404 error** for `aws-architecture-diagram.png`, the PNG file doesn't exist yet. Here's the fastest solution:
+
+### **🎯 Method 1: Online Mermaid Editor (2 minutes)**
+1. **Copy the diagram code**: Open `mermaid-diagram-code.txt` in this directory
+2. **Go to**: [https://mermaid.live/](https://mermaid.live/)
+3. **Paste** the code into the editor
+4. **Download**: Click **Actions** → **Download PNG**
+5. **Save as**: `aws-architecture-diagram.png` in this directory
+6. **Commit**: `git add aws-architecture-diagram.png && git commit -m "Add architecture diagram PNG" && git push`
+
+### **🎯 Method 2: Use the Shell Script**
+```bash
+cd images/
+chmod +x generate-png.sh
+./generate-png.sh
+```
+
+### **🎯 Method 3: View the Diagram Directly**
+The complete architecture diagram is already available in the main file:
+- **📋 View on GitHub**: `aws-architecture-diagram.md` (automatically rendered)
+- **🔗 Direct Link**: [Architecture Documentation](../aws-architecture-diagram.md)
+
 ## 📁 Files
 
-### **aws-architecture-diagram.png**
-- **Source**: Lucidchart
+### **aws-architecture-diagram.png** *(To be generated)*
+- **Source**: Mermaid diagram or Lucidchart
 - **Format**: High-resolution PNG (300+ DPI)
 - **Usage**: Main README documentation
 - **Size**: Recommended max 2MB for fast loading
 
+### **mermaid-diagram-code.txt**
+- **Source**: Extracted from `aws-architecture-diagram.md`
+- **Format**: Plain text Mermaid code
+- **Usage**: Copy to Mermaid Live Editor for PNG generation
+- **Purpose**: Easy copying without formatting issues
+
+### **generate-png.sh**
+- **Source**: Automated shell script
+- **Format**: Bash script
+- **Usage**: Auto-generates PNG from Mermaid code
+- **Requirements**: Node.js and npm for Mermaid CLI
+
+### **generate-diagram.md**
+- **Source**: Documentation
+- **Format**: Markdown guide
+- **Usage**: Complete instructions for PNG generation
+- **Methods**: Multiple approaches (CLI, online, VS Code)
+
 ### **aws-architecture-diagram.svg** *(Optional)*
-- **Source**: Lucidchart SVG export
+- **Source**: Mermaid or Lucidchart SVG export
 - **Format**: Scalable Vector Graphics
 - **Usage**: Web presentations, scaling without quality loss
 - **Size**: Typically smaller than PNG
