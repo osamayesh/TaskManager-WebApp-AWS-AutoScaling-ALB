@@ -12,21 +12,30 @@ A scalable, cloud-native Task Manager API built with **.NET Core** and deployed 
 
 This project implements a **multi-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
 
-### **🎨 AWS Architecture Diagram**
+### **🎨 AWS Architecture Diagrams**
 
-![AWS Architecture Diagram](./images/aws-architecture-diagram.jpg)
+#### **📊 Overview Architecture Diagram**
+![AWS Architecture Overview](./images/aws-architecture-diagram.jpg)
 
-*Comprehensive AWS architecture diagram showing the complete infrastructure setup with VPC, subnets, load balancing, auto scaling, database, caching, and monitoring components.*
+*High-level AWS architecture overview showing the main infrastructure components and data flow.*
+
+#### **🏗️ Detailed Architecture Diagram**
+![AWS Detailed Architecture](./images/aws-architecture-detailed.jpeg)
+
+*Comprehensive AWS multi-tier architecture diagram showing the complete infrastructure setup with detailed component relationships, network topology, and service interactions.*
 
 **📋 Architecture Features:**
-- **VPC**: Multi-AZ deployment with public and private subnets
-- **Load Balancing**: Application Load Balancer with health checks
-- **Auto Scaling**: EC2 instances with automatic scaling policies
-- **Database**: RDS MySQL with Multi-AZ deployment
-- **Caching**: ElastiCache Redis for performance optimization
-- **Storage**: S3 bucket for static assets and backups
-- **Security**: IAM roles, Secrets Manager, and VPC endpoints
-- **Monitoring**: CloudWatch logs and metrics with SNS alerting
+- **🌐 VPC**: Multi-AZ deployment (us-east-1a, us-east-1b) with 10.0.0.0/16 CIDR
+- **🔗 VPC Endpoints**: Private connectivity to AWS services
+- **🌍 Public Subnets**: Internet-facing components (ALB, NAT Gateways)
+- **🔒 Private Subnets**: Secure application and database tiers
+- **⚖️ Application Load Balancer**: Internet-facing with health checks and SSL termination
+- **🚀 Auto Scaling Groups**: EC2 instances distributed across multiple AZs
+- **🗄️ RDS MySQL**: Multi-AZ deployment for high availability
+- **📊 CloudWatch**: Comprehensive monitoring and logging
+- **📧 SNS**: Real-time alerting and notifications
+- **🌐 Internet Gateway**: Public internet connectivity
+- **🔐 NAT Gateways**: Secure outbound internet access for private resources
 
 ---
 

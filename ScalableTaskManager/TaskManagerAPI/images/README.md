@@ -2,13 +2,20 @@
 
 This directory contains visual representations of the TaskManager API AWS architecture.
 
-## 🎯 **AWS Architecture Diagram**
+## 🎯 **AWS Architecture Diagrams**
 
-### **📱 Current Architecture Diagram** - `aws-architecture-diagram.jpg`
-- **Format**: Professional AWS architecture diagram
-- **Content**: Complete multi-tier infrastructure layout
-- **Features**: VPC, subnets, load balancing, auto scaling, database, caching, and monitoring
-- **Best for**: Documentation, presentations, technical reviews
+### **📊 Overview Architecture Diagram** - `aws-architecture-diagram.jpg`
+- **Size**: 154KB
+- **Format**: High-level overview diagram
+- **Content**: Main infrastructure components and data flow
+- **Best for**: Quick reference, executive summaries, high-level presentations
+
+### **🏗️ Detailed Architecture Diagram** - `aws-architecture-detailed.jpeg`
+- **Size**: 2.17MB  
+- **Format**: Comprehensive detailed diagram
+- **Content**: Complete multi-tier infrastructure with all AWS services, network topology, and component relationships
+- **Features**: VPC endpoints, Multi-AZ deployment, detailed subnet architecture, all AWS services
+- **Best for**: Technical documentation, architecture reviews, implementation reference
 
 ## 🏗️ **Architecture Components Shown**
 
@@ -41,12 +48,12 @@ The diagram displays the complete **multi-tier AWS architecture**:
 ## 📁 **File Structure**
 
 ### **🖼️ Diagram Files**
-| File | Description | Purpose |
-|------|-------------|---------|
-| `aws-architecture-diagram.jpg` | Main architecture diagram | Primary visual reference |
-| `aws-architecture-diagram.png` | Legacy diagram | Backup/comparison |
-| `aws-architecture-diagram-hd.png` | High-resolution version | Detailed presentations |
-| `aws-architecture-diagram.svg` | Vector format | Scalable web integration |
+| File | Description | Size | Purpose |
+|------|-------------|------|---------|
+| `aws-architecture-diagram.jpg` | Overview architecture diagram | 154KB | High-level reference and executive presentations |
+| `aws-architecture-detailed.jpeg` | Detailed architecture diagram | 2.17MB | Technical documentation and implementation reference |
+| `aws-architecture-diagram-hd.png` | Legacy high-resolution version | 207KB | Backup/comparison |
+| `aws-architecture-diagram.svg` | Vector format | 78KB | Scalable web integration |
 
 ### **🛠️ Generation Tools**
 | File | Purpose | Description |
@@ -98,7 +105,7 @@ If you need to modify the architecture diagram:
 
 1. **Update the source**: Create or modify the architectural design
 2. **Export as JPG/PNG**: Ensure high resolution for clarity
-3. **Replace file**: Update `aws-architecture-diagram.jpg`
+3. **Replace files**: Update `aws-architecture-diagram.jpg` (overview) or `aws-architecture-detailed.jpeg` (detailed)
 4. **Update documentation**: Modify this README if components change
 5. **Commit changes**: Push updates to version control
 
