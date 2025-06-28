@@ -4,7 +4,7 @@ This directory contains visual representations of the TaskManager API AWS archit
 
 ## 🎯 **AWS Architecture Diagram**
 
-### **📱 Current Architecture Diagram** - `aws-architecture-diagram-new.png`
+### **📱 Current Architecture Diagram** - `aws-architecture-diagram.jpg`
 - **Format**: Professional AWS architecture diagram
 - **Content**: Complete multi-tier infrastructure layout
 - **Features**: VPC, subnets, load balancing, auto scaling, database, caching, and monitoring
@@ -43,7 +43,7 @@ The diagram displays the complete **multi-tier AWS architecture**:
 ### **🖼️ Diagram Files**
 | File | Description | Purpose |
 |------|-------------|---------|
-| `aws-architecture-diagram-new.png` | Main architecture diagram | Primary visual reference |
+| `aws-architecture-diagram.jpg` | Main architecture diagram | Primary visual reference |
 | `aws-architecture-diagram.png` | Legacy diagram | Backup/comparison |
 | `aws-architecture-diagram-hd.png` | High-resolution version | Detailed presentations |
 | `aws-architecture-diagram.svg` | Vector format | Scalable web integration |
@@ -97,15 +97,15 @@ The diagram displays the complete **multi-tier AWS architecture**:
 If you need to modify the architecture diagram:
 
 1. **Update the source**: Create or modify the architectural design
-2. **Export as PNG**: Ensure high resolution for clarity
-3. **Replace file**: Update `aws-architecture-diagram-new.png`
+2. **Export as JPG/PNG**: Ensure high resolution for clarity
+3. **Replace file**: Update `aws-architecture-diagram.jpg`
 4. **Update documentation**: Modify this README if components change
 5. **Commit changes**: Push updates to version control
 
 ## 📋 **Technical Specifications**
 
 ### **Diagram Standards**
-- **Format**: PNG for compatibility and clarity
+- **Format**: JPG/PNG for compatibility and clarity
 - **Resolution**: High-resolution for detailed viewing
 - **Color Scheme**: AWS official colors for service identification
 - **Layout**: Logical flow from client to data storage

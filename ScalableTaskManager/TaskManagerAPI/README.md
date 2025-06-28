@@ -14,7 +14,7 @@ This project implements a **multi-tier AWS architecture** with high availability
 
 ### **🎨 AWS Architecture Diagram**
 
-![AWS Architecture Diagram](./images/aws-architecture-diagram-new.png)
+![AWS Architecture Diagram](./images/aws-architecture-diagram.jpg)
 
 *Comprehensive AWS architecture diagram showing the complete infrastructure setup with VPC, subnets, load balancing, auto scaling, database, caching, and monitoring components.*
 
