@@ -12,15 +12,9 @@ A scalable, cloud-native Task Manager API built with **.NET Core** and deployed 
 
 This project implements a **multi-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
 
-### **🎨 AWS Architecture Diagrams**
+### **🎨 AWS Architecture Diagram**
 
-#### **📊 Overview Architecture Diagram**
-![AWS Architecture Overview](./images/aws-architecture-diagram.jpg)
-
-*High-level AWS architecture overview showing the main infrastructure components and data flow.*
-
-#### **🏗️ Detailed Architecture Diagram**
-![AWS Detailed Architecture](./images/aws-architecture-detailed.jpeg)
+![AWS Architecture](./images/aws-architecture-detailed.jpeg)
 
 *Comprehensive AWS multi-tier architecture diagram showing the complete infrastructure setup with detailed component relationships, network topology, and service interactions.*
 

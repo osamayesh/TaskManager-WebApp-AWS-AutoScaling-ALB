@@ -2,24 +2,18 @@
 
 This directory contains visual representations of the TaskManager API AWS architecture.
 
-## 🎯 **AWS Architecture Diagrams**
+## 🎯 **AWS Architecture Diagram**
 
-### **📊 Overview Architecture Diagram** - `aws-architecture-diagram.jpg`
-- **Size**: 154KB
-- **Format**: High-level overview diagram
-- **Content**: Main infrastructure components and data flow
-- **Best for**: Quick reference, executive summaries, high-level presentations
-
-### **🏗️ Detailed Architecture Diagram** - `aws-architecture-detailed.jpeg`
+### **🏗️ Professional Architecture Diagram** - `aws-architecture-detailed.jpeg`
 - **Size**: 2.17MB  
-- **Format**: Comprehensive detailed diagram
-- **Content**: Complete multi-tier infrastructure with all AWS services, network topology, and component relationships
-- **Features**: VPC endpoints, Multi-AZ deployment, detailed subnet architecture, all AWS services
-- **Best for**: Technical documentation, architecture reviews, implementation reference
+- **Format**: Comprehensive multi-tier architecture diagram
+- **Content**: Complete infrastructure setup with all AWS services, network topology, and detailed component relationships
+- **Features**: VPC endpoints, Multi-AZ deployment, detailed subnet architecture, all AWS services integration
+- **Best for**: Technical documentation, architecture reviews, implementation reference, presentations
 
 ## 🏗️ **Architecture Components Shown**
 
-The diagram displays the complete **multi-tier AWS architecture**:
+The architecture diagram displays the complete **multi-tier AWS architecture**:
 
 ### **🌐 Infrastructure**
 - **VPC**: Multi-AZ virtual private cloud with isolated network
@@ -50,8 +44,7 @@ The diagram displays the complete **multi-tier AWS architecture**:
 ### **🖼️ Diagram Files**
 | File | Description | Size | Purpose |
 |------|-------------|------|---------|
-| `aws-architecture-diagram.jpg` | Overview architecture diagram | 154KB | High-level reference and executive presentations |
-| `aws-architecture-detailed.jpeg` | Detailed architecture diagram | 2.17MB | Technical documentation and implementation reference |
+| `aws-architecture-detailed.jpeg` | Main architecture diagram | 2.17MB | Primary visual reference for all documentation and presentations |
 | `aws-architecture-diagram-hd.png` | Legacy high-resolution version | 207KB | Backup/comparison |
 | `aws-architecture-diagram.svg` | Vector format | 78KB | Scalable web integration |
 
@@ -105,7 +98,7 @@ If you need to modify the architecture diagram:
 
 1. **Update the source**: Create or modify the architectural design
 2. **Export as JPG/PNG**: Ensure high resolution for clarity
-3. **Replace files**: Update `aws-architecture-diagram.jpg` (overview) or `aws-architecture-detailed.jpeg` (detailed)
+3. **Replace file**: Update `aws-architecture-detailed.jpeg`
 4. **Update documentation**: Modify this README if components change
 5. **Commit changes**: Push updates to version control
 
