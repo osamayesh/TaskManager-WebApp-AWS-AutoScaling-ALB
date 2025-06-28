@@ -10,82 +10,23 @@ A scalable, cloud-native Task Manager API built with **.NET Core** and deployed 
 
 ## 🏗️ Solution Architecture
 
-This project implements a **3-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
+This project implements a **multi-tier AWS architecture** with high availability, auto-scaling, and enterprise-grade security.
 
-### **📊 Interactive Mermaid Diagram**
+### **🎨 AWS Architecture Diagram**
 
-```mermaid
-graph LR
-    %% Client
-    Client["👥<br/>Client"]
-    
-    %% AWS Cloud
-    subgraph AWS["☁️ AWS Cloud"]
-        
-        %% Main Architecture Flow (4 steps)
-        subgraph MainFlow["TaskManager AWS Architecture"]
-            direction LR
-            IGW["1️⃣<br/>🌐<br/>Internet<br/>Gateway"]
-            ALB["2️⃣<br/>🔄<br/>Application<br/>Load Balancer"]
-            EC2["3️⃣<br/>🟠<br/>Amazon EC2<br/>t3.medium<br/>Auto Scaling"]
-            RDS["4️⃣<br/>🗄️<br/>Amazon RDS<br/>MySQL 8.0<br/>Multi-AZ"]
-        end
-        
-        %% Supporting Services
-        subgraph Support["Supporting Services"]
-            VPC["🏗️<br/>Amazon VPC<br/>10.0.0.0/16"]
-            IAM["🔐<br/>AWS IAM<br/>Roles & Policies"]
-            CloudWatch["📈<br/>CloudWatch<br/>Logs & Metrics"]
-            SNS["📧<br/>Amazon SNS<br/>Email Alerts"]
-        end
-    end
-    
-    %% Main data flow (solid arrows)
-    Client --> IGW
-    IGW --> ALB
-    ALB --> EC2
-    EC2 --> RDS
-    
-    %% Monitoring flow (solid arrows)
-    EC2 --> CloudWatch
-    RDS --> CloudWatch
-    ALB --> CloudWatch
-    CloudWatch --> SNS
-    
-    %% Infrastructure relationships (dotted arrows)
-    VPC -.-> ALB
-    VPC -.-> EC2
-    VPC -.-> RDS
-    IAM -.-> EC2
-    IAM -.-> RDS
-    
-    %% AWS Service Colors (Official AWS Colors)
-    classDef compute fill:#FF9900,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
-    classDef database fill:#3F48CC,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
-    classDef networking fill:#8C4FFF,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
-    classDef monitoring fill:#759C3E,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
-    classDef security fill:#FF4B4B,stroke:#FFFFFF,stroke-width:2px,color:#FFFFFF
-    classDef client fill:#232F3E,stroke:#FF9900,stroke-width:2px,color:#FFFFFF
-    
-    %% Apply classes to nodes
-    class EC2 compute
-    class RDS database
-    class IGW,ALB,VPC networking
-    class CloudWatch,SNS monitoring
-    class IAM security
-    class Client client
-```
+![AWS Architecture Diagram](./images/aws-architecture-diagram-new.png)
 
-### **🎨 Professional Lucidchart Diagram**
+*Comprehensive AWS architecture diagram showing the complete infrastructure setup with VPC, subnets, load balancing, auto scaling, database, caching, and monitoring components.*
 
-<!-- Replace this section with your Lucidchart diagram once created -->
-![AWS Architecture Diagram](./images/aws-architecture-diagram.png)
-
-*High-resolution AWS architecture diagram created with Lucidchart showing the complete infrastructure setup.*
-
-**🔗 Interactive Diagram Links:**
-- **Lucidchart Live Diagram**: [View Interactive Diagram](https://lucid.app/your-diagram-link) *(Replace with your actual link)*
-- **Download High-Res**: [Download PNG](./images/aws-architecture-diagram.png)
+**📋 Architecture Features:**
+- **VPC**: Multi-AZ deployment with public and private subnets
+- **Load Balancing**: Application Load Balancer with health checks
+- **Auto Scaling**: EC2 instances with automatic scaling policies
+- **Database**: RDS MySQL with Multi-AZ deployment
+- **Caching**: ElastiCache Redis for performance optimization
+- **Storage**: S3 bucket for static assets and backups
+- **Security**: IAM roles, Secrets Manager, and VPC endpoints
+- **Monitoring**: CloudWatch logs and metrics with SNS alerting
 
 ---
 
